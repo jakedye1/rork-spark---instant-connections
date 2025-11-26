@@ -11,6 +11,7 @@ import {
   Check,
   FileText,
   Info,
+  ChevronLeft,
 } from "lucide-react-native";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,6 +26,7 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { BlurView } from "expo-blur";
 import Colors from "@/constants/colors";
 
 export default function SettingsScreen() {
@@ -39,7 +41,7 @@ export default function SettingsScreen() {
     return () => {
       console.log('Settings screen unmounted');
     };
-  }, []);
+  }, [user]);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [matchNotifications, setMatchNotifications] = useState(true);
@@ -90,12 +92,11 @@ export default function SettingsScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={[Colors.babyBlue, Colors.pastelYellow]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
+    <View style={styles.container}>
+      <LinearGradient
+        colors={[Colors.background, Colors.backgroundLight]}
+        style={styles.background}
+      />
       <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <View style={styles.header}>
           <TouchableOpacity
@@ -105,11 +106,12 @@ export default function SettingsScreen() {
               router.back();
             }}
           >
-            <ChevronRight
-              size={24}
-              color={Colors.charcoal}
-              style={{ transform: [{ rotate: "180deg" }] }}
-            />
+            <BlurView intensity={20} tint="dark" style={styles.backButtonBlur}>
+              <ChevronLeft
+                size={24}
+                color={Colors.white}
+              />
+            </BlurView>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Account Settings</Text>
           <View style={styles.backButton} />
@@ -122,10 +124,10 @@ export default function SettingsScreen() {
         >
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Location</Text>
-            <View style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <MapPin size={24} color={Colors.charcoal} />
+                  <MapPin size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Location Services</Text>
                     <Text style={styles.settingDescription}>
@@ -138,9 +140,9 @@ export default function SettingsScreen() {
                 <Switch
                   value={locationEnabled}
                   onValueChange={handleLocationToggle}
-                  trackColor={{ false: Colors.mediumGray, true: Colors.pastelYellow }}
+                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
                   thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.mediumGray}
+                  ios_backgroundColor={Colors.glass}
                 />
               </View>
 
@@ -152,7 +154,7 @@ export default function SettingsScreen() {
                     onPress={handleDistanceChange}
                   >
                     <View style={styles.settingLeft}>
-                      <Globe size={24} color={Colors.charcoal} />
+                      <Globe size={24} color={Colors.textSecondary} />
                       <View style={styles.settingTextContainer}>
                         <Text style={styles.settingTitle}>Maximum Distance</Text>
                         <Text style={styles.settingDescription}>
@@ -160,22 +162,22 @@ export default function SettingsScreen() {
                         </Text>
                       </View>
                     </View>
-                    <ChevronRight size={20} color={Colors.mediumGray} />
+                    <ChevronRight size={20} color={Colors.textSecondary} />
                   </TouchableOpacity>
                 </>
               )}
-            </View>
+            </BlurView>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Profile Settings</Text>
-            <View style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <TouchableOpacity
                 style={styles.settingRow}
                 onPress={() => router.push("/edit-profile" as any)}
               >
                 <View style={styles.settingLeft}>
-                  <User size={24} color={Colors.charcoal} />
+                  <User size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Edit Profile</Text>
                     <Text style={styles.settingDescription}>
@@ -183,17 +185,17 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color={Colors.mediumGray} />
+                <ChevronRight size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
-            </View>
+            </BlurView>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Notifications</Text>
-            <View style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <Bell size={24} color={Colors.charcoal} />
+                  <Bell size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Push Notifications</Text>
                     <Text style={styles.settingDescription}>
@@ -204,9 +206,9 @@ export default function SettingsScreen() {
                 <Switch
                   value={pushNotifications}
                   onValueChange={setPushNotifications}
-                  trackColor={{ false: Colors.mediumGray, true: Colors.pastelYellow }}
+                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
                   thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.mediumGray}
+                  ios_backgroundColor={Colors.glass}
                 />
               </View>
 
@@ -214,7 +216,7 @@ export default function SettingsScreen() {
 
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <Smartphone size={24} color={Colors.charcoal} />
+                  <Smartphone size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Email Notifications</Text>
                     <Text style={styles.settingDescription}>
@@ -225,9 +227,9 @@ export default function SettingsScreen() {
                 <Switch
                   value={emailNotifications}
                   onValueChange={setEmailNotifications}
-                  trackColor={{ false: Colors.mediumGray, true: Colors.pastelYellow }}
+                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
                   thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.mediumGray}
+                  ios_backgroundColor={Colors.glass}
                 />
               </View>
 
@@ -235,7 +237,7 @@ export default function SettingsScreen() {
 
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <Check size={24} color={Colors.charcoal} />
+                  <Check size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>New Matches</Text>
                     <Text style={styles.settingDescription}>
@@ -246,9 +248,9 @@ export default function SettingsScreen() {
                 <Switch
                   value={matchNotifications}
                   onValueChange={setMatchNotifications}
-                  trackColor={{ false: Colors.mediumGray, true: Colors.pastelYellow }}
+                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
                   thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.mediumGray}
+                  ios_backgroundColor={Colors.glass}
                 />
               </View>
 
@@ -256,7 +258,7 @@ export default function SettingsScreen() {
 
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <Bell size={24} color={Colors.charcoal} />
+                  <Bell size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Messages</Text>
                     <Text style={styles.settingDescription}>
@@ -267,20 +269,20 @@ export default function SettingsScreen() {
                 <Switch
                   value={messageNotifications}
                   onValueChange={setMessageNotifications}
-                  trackColor={{ false: Colors.mediumGray, true: Colors.pastelYellow }}
+                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
                   thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.mediumGray}
+                  ios_backgroundColor={Colors.glass}
                 />
               </View>
-            </View>
+            </BlurView>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Privacy & Safety</Text>
-            <View style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <Eye size={24} color={Colors.charcoal} />
+                  <Eye size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Show Online Status</Text>
                     <Text style={styles.settingDescription}>
@@ -291,9 +293,9 @@ export default function SettingsScreen() {
                 <Switch
                   value={showOnlineStatus}
                   onValueChange={setShowOnlineStatus}
-                  trackColor={{ false: Colors.mediumGray, true: Colors.pastelYellow }}
+                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
                   thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.mediumGray}
+                  ios_backgroundColor={Colors.glass}
                 />
               </View>
 
@@ -301,7 +303,7 @@ export default function SettingsScreen() {
 
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <MapPin size={24} color={Colors.charcoal} />
+                  <MapPin size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Show Distance</Text>
                     <Text style={styles.settingDescription}>
@@ -312,9 +314,9 @@ export default function SettingsScreen() {
                 <Switch
                   value={showDistance}
                   onValueChange={setShowDistance}
-                  trackColor={{ false: Colors.mediumGray, true: Colors.pastelYellow }}
+                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
                   thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.mediumGray}
+                  ios_backgroundColor={Colors.glass}
                 />
               </View>
 
@@ -322,7 +324,7 @@ export default function SettingsScreen() {
 
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <Shield size={24} color={Colors.charcoal} />
+                  <Shield size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Incognito Mode</Text>
                     <Text style={styles.settingDescription}>
@@ -333,17 +335,17 @@ export default function SettingsScreen() {
                 <Switch
                   value={incognitoMode}
                   onValueChange={setIncognitoMode}
-                  trackColor={{ false: Colors.mediumGray, true: Colors.pastelYellow }}
+                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
                   thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.mediumGray}
+                  ios_backgroundColor={Colors.glass}
                 />
               </View>
-            </View>
+            </BlurView>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Legal & About</Text>
-            <View style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <TouchableOpacity 
                 style={styles.settingRow}
                 onPress={() => {
@@ -352,7 +354,7 @@ export default function SettingsScreen() {
                 }}
               >
                 <View style={styles.settingLeft}>
-                  <FileText size={24} color={Colors.charcoal} />
+                  <FileText size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Terms of Service</Text>
                     <Text style={styles.settingDescription}>
@@ -360,7 +362,7 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color={Colors.mediumGray} />
+                <ChevronRight size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
 
               <View style={styles.divider} />
@@ -373,7 +375,7 @@ export default function SettingsScreen() {
                 }}
               >
                 <View style={styles.settingLeft}>
-                  <Shield size={24} color={Colors.charcoal} />
+                  <Shield size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Privacy Policy</Text>
                     <Text style={styles.settingDescription}>
@@ -381,7 +383,7 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color={Colors.mediumGray} />
+                <ChevronRight size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
 
               <View style={styles.divider} />
@@ -394,7 +396,7 @@ export default function SettingsScreen() {
                 }}
               >
                 <View style={styles.settingLeft}>
-                  <Info size={24} color={Colors.charcoal} />
+                  <Info size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>About Spark</Text>
                     <Text style={styles.settingDescription}>
@@ -402,7 +404,7 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color={Colors.mediumGray} />
+                <ChevronRight size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
 
               <View style={styles.divider} />
@@ -415,19 +417,27 @@ export default function SettingsScreen() {
                   </View>
                 </View>
               </TouchableOpacity>
-            </View>
+            </BlurView>
           </View>
 
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.background,
+  },
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
   },
   safeArea: {
     flex: 1,
@@ -442,13 +452,20 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  backButtonBlur: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: "700" as const,
-    color: Colors.charcoal,
+    fontWeight: "700",
+    color: Colors.white,
   },
   scrollView: {
     flex: 1,
@@ -462,19 +479,15 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "700" as const,
-    color: Colors.charcoal,
+    fontWeight: "700",
+    color: Colors.white,
     marginBottom: 12,
   },
   card: {
-    backgroundColor: Colors.white,
     borderRadius: 16,
     overflow: "hidden",
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   settingRow: {
     flexDirection: "row",
@@ -493,19 +506,18 @@ const styles = StyleSheet.create({
   },
   settingTitle: {
     fontSize: 16,
-    fontWeight: "600" as const,
-    color: Colors.charcoal,
+    fontWeight: "600",
+    color: Colors.white,
     marginBottom: 2,
   },
   settingDescription: {
     fontSize: 13,
-    fontWeight: "500" as const,
-    color: Colors.charcoal,
-    opacity: 0.6,
+    fontWeight: "500",
+    color: Colors.textSecondary,
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.lightGray,
+    backgroundColor: Colors.glassBorder,
     marginLeft: 52,
   },
   bottomSpacer: {

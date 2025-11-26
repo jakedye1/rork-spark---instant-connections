@@ -1,6 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import {
   User,
+  Users,
   Camera,
   Lock,
   Mail,
@@ -12,6 +13,7 @@ import {
   Instagram,
   Facebook,
   Twitter,
+  ChevronLeft,
 } from "lucide-react-native";
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,6 +30,7 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { BlurView } from "expo-blur";
 import Colors from "@/constants/colors";
 
 export default function EditProfileScreen() {
@@ -200,27 +203,26 @@ export default function EditProfileScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={[Colors.babyBlue, Colors.pastelYellow]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
+    <View style={styles.container}>
+      <LinearGradient
+        colors={[Colors.background, Colors.backgroundLight]}
+        style={styles.background}
+      />
       <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <View style={styles.header}>
           <TouchableOpacity
-            style={styles.backButton}
+            style={styles.headerButton}
             onPress={() => router.back()}
           >
-            <ChevronRight
-              size={24}
-              color={Colors.charcoal}
-              style={{ transform: [{ rotate: "180deg" }] }}
-            />
+            <BlurView intensity={20} tint="dark" style={styles.headerButtonBlur}>
+              <ChevronLeft size={24} color={Colors.white} />
+            </BlurView>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Profile</Text>
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Save size={24} color={Colors.charcoal} />
+          <TouchableOpacity style={styles.headerButton} onPress={handleSave}>
+            <BlurView intensity={20} tint="dark" style={styles.headerButtonBlur}>
+              <Save size={24} color={Colors.babyBlue} />
+            </BlurView>
           </TouchableOpacity>
         </View>
 
@@ -236,14 +238,19 @@ export default function EditProfileScreen() {
                   {profileImage && profileImage.trim().length > 0 ? (
                     <Image source={{ uri: profileImage }} style={styles.avatarImage} contentFit="cover" />
                   ) : (
-                    <User size={48} color={Colors.charcoal} />
+                    <User size={48} color={Colors.textSecondary} />
                   )}
                 </View>
                 <TouchableOpacity
                   style={styles.cameraButton}
                   onPress={handleChangeProfilePicture}
                 >
-                  <Camera size={20} color={Colors.white} />
+                  <LinearGradient
+                    colors={[Colors.babyBlue, Colors.aquaGlow]}
+                    style={styles.cameraButtonGradient}
+                  >
+                    <Camera size={18} color={Colors.charcoal} />
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
               <TouchableOpacity onPress={handleChangeProfilePicture}>
@@ -254,13 +261,13 @@ export default function EditProfileScreen() {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Account Information</Text>
-            <View style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <TouchableOpacity
                 style={styles.settingRow}
                 onPress={handleChangeEmail}
               >
                 <View style={styles.settingLeft}>
-                  <Mail size={24} color={Colors.charcoal} />
+                  <Mail size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Email</Text>
                     <Text style={styles.settingDescription}>
@@ -268,7 +275,7 @@ export default function EditProfileScreen() {
                     </Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color={Colors.mediumGray} />
+                <ChevronRight size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
 
               <View style={styles.divider} />
@@ -278,7 +285,7 @@ export default function EditProfileScreen() {
                 onPress={handleChangePassword}
               >
                 <View style={styles.settingLeft}>
-                  <Lock size={24} color={Colors.charcoal} />
+                  <Lock size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Password</Text>
                     <Text style={styles.settingDescription}>
@@ -286,22 +293,22 @@ export default function EditProfileScreen() {
                     </Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color={Colors.mediumGray} />
+                <ChevronRight size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
-            </View>
+            </BlurView>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Basic Information</Text>
-            <View style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <View style={styles.inputRow}>
-                <User size={24} color={Colors.charcoal} />
+                <User size={24} color={Colors.textSecondary} />
                 <View style={styles.inputContainer}>
                   <Text style={styles.inputLabel}>Name</Text>
                   <View style={styles.readOnlyInputContainer}>
                     <Text style={styles.readOnlyInput}>{name}</Text>
                     <View style={styles.lockedBadge}>
-                      <Lock size={12} color={Colors.mediumGray} />
+                      <Lock size={12} color={Colors.textSecondary} />
                     </View>
                   </View>
                 </View>
@@ -310,13 +317,13 @@ export default function EditProfileScreen() {
               <View style={styles.divider} />
 
               <View style={styles.inputRow}>
-                <Calendar size={24} color={Colors.charcoal} />
+                <Calendar size={24} color={Colors.textSecondary} />
                 <View style={styles.inputContainer}>
                   <Text style={styles.inputLabel}>Age</Text>
                   <View style={styles.readOnlyInputContainer}>
                     <Text style={styles.readOnlyInput}>{age}</Text>
                     <View style={styles.lockedBadge}>
-                      <Lock size={12} color={Colors.mediumGray} />
+                      <Lock size={12} color={Colors.textSecondary} />
                     </View>
                   </View>
                 </View>
@@ -325,7 +332,7 @@ export default function EditProfileScreen() {
               <View style={styles.divider} />
 
               <View style={styles.inputRow}>
-                <Phone size={24} color={Colors.charcoal} />
+                <Phone size={24} color={Colors.textSecondary} />
                 <View style={styles.inputContainer}>
                   <Text style={styles.inputLabel}>Phone Number (Optional)</Text>
                   <TextInput
@@ -333,12 +340,12 @@ export default function EditProfileScreen() {
                     value={phoneNumber}
                     onChangeText={setPhoneNumber}
                     placeholder="Enter your phone number"
-                    placeholderTextColor={Colors.mediumGray}
+                    placeholderTextColor={Colors.textSecondary}
                     keyboardType="phone-pad"
                   />
                 </View>
               </View>
-            </View>
+            </BlurView>
           </View>
 
           <View style={styles.section}>
@@ -346,9 +353,9 @@ export default function EditProfileScreen() {
             <Text style={styles.sectionDescription}>
               Connect your social media accounts (Optional)
             </Text>
-            <View style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <View style={styles.inputRow}>
-                <Instagram size={24} color={Colors.charcoal} />
+                <Instagram size={24} color={Colors.textSecondary} />
                 <View style={styles.inputContainer}>
                   <Text style={styles.inputLabel}>Instagram</Text>
                   <TextInput
@@ -356,7 +363,7 @@ export default function EditProfileScreen() {
                     value={instagram}
                     onChangeText={setInstagram}
                     placeholder="@username"
-                    placeholderTextColor={Colors.mediumGray}
+                    placeholderTextColor={Colors.textSecondary}
                     autoCapitalize="none"
                   />
                 </View>
@@ -365,7 +372,7 @@ export default function EditProfileScreen() {
               <View style={styles.divider} />
 
               <View style={styles.inputRow}>
-                <Facebook size={24} color={Colors.charcoal} />
+                <Facebook size={24} color={Colors.textSecondary} />
                 <View style={styles.inputContainer}>
                   <Text style={styles.inputLabel}>Facebook</Text>
                   <TextInput
@@ -373,7 +380,7 @@ export default function EditProfileScreen() {
                     value={facebook}
                     onChangeText={setFacebook}
                     placeholder="username or profile URL"
-                    placeholderTextColor={Colors.mediumGray}
+                    placeholderTextColor={Colors.textSecondary}
                     autoCapitalize="none"
                   />
                 </View>
@@ -392,7 +399,7 @@ export default function EditProfileScreen() {
                     value={tiktok}
                     onChangeText={setTiktok}
                     placeholder="@username"
-                    placeholderTextColor={Colors.mediumGray}
+                    placeholderTextColor={Colors.textSecondary}
                     autoCapitalize="none"
                   />
                 </View>
@@ -401,7 +408,7 @@ export default function EditProfileScreen() {
               <View style={styles.divider} />
 
               <View style={styles.inputRow}>
-                <Twitter size={24} color={Colors.charcoal} />
+                <Twitter size={24} color={Colors.textSecondary} />
                 <View style={styles.inputContainer}>
                   <Text style={styles.inputLabel}>Twitter / X</Text>
                   <TextInput
@@ -409,84 +416,103 @@ export default function EditProfileScreen() {
                     value={twitter}
                     onChangeText={setTwitter}
                     placeholder="@username"
-                    placeholderTextColor={Colors.mediumGray}
+                    placeholderTextColor={Colors.textSecondary}
                     autoCapitalize="none"
                   />
                 </View>
               </View>
-            </View>
+            </BlurView>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>What are you looking for?</Text>
             <View style={styles.lookingForContainer}>
               <TouchableOpacity
-                style={[
-                  styles.lookingForButton,
-                  lookingFor === "dating" && styles.lookingForButtonActive,
-                ]}
+                style={styles.lookingForButtonWrapper}
                 onPress={() => setLookingFor("dating")}
               >
-                <Heart
-                  size={24}
-                  color={
-                    lookingFor === "dating" ? Colors.white : Colors.charcoal
-                  }
-                />
-                <Text
+                <BlurView 
+                  intensity={lookingFor === "dating" ? 40 : 10} 
+                  tint="dark" 
                   style={[
-                    styles.lookingForText,
-                    lookingFor === "dating" && styles.lookingForTextActive,
+                    styles.lookingForButton,
+                    lookingFor === "dating" && styles.lookingForButtonActive
                   ]}
                 >
-                  Dating
-                </Text>
+                  <Heart
+                    size={24}
+                    color={
+                      lookingFor === "dating" ? Colors.babyBlue : Colors.textSecondary
+                    }
+                    fill={lookingFor === "dating" ? Colors.babyBlue : "transparent"}
+                  />
+                  <Text
+                    style={[
+                      styles.lookingForText,
+                      lookingFor === "dating" && styles.lookingForTextActive,
+                    ]}
+                  >
+                    Dating
+                  </Text>
+                </BlurView>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[
-                  styles.lookingForButton,
-                  lookingFor === "friends" && styles.lookingForButtonActive,
-                ]}
+                style={styles.lookingForButtonWrapper}
                 onPress={() => setLookingFor("friends")}
               >
-                <User
-                  size={24}
-                  color={
-                    lookingFor === "friends" ? Colors.white : Colors.charcoal
-                  }
-                />
-                <Text
+                <BlurView 
+                  intensity={lookingFor === "friends" ? 40 : 10} 
+                  tint="dark" 
                   style={[
-                    styles.lookingForText,
-                    lookingFor === "friends" && styles.lookingForTextActive,
+                    styles.lookingForButton,
+                    lookingFor === "friends" && styles.lookingForButtonActive
                   ]}
                 >
-                  Friends
-                </Text>
+                  <User
+                    size={24}
+                    color={
+                      lookingFor === "friends" ? Colors.pastelYellow : Colors.textSecondary
+                    }
+                  />
+                  <Text
+                    style={[
+                      styles.lookingForText,
+                      lookingFor === "friends" && styles.lookingForTextActive,
+                    ]}
+                  >
+                    Friends
+                  </Text>
+                </BlurView>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[
-                  styles.lookingForButton,
-                  lookingFor === "groups" && styles.lookingForButtonActive,
-                ]}
+                style={styles.lookingForButtonWrapper}
                 onPress={() => setLookingFor("groups")}
               >
-                <User
-                  size={24}
-                  color={
-                    lookingFor === "groups" ? Colors.white : Colors.charcoal
-                  }
-                />
-                <Text
+                <BlurView 
+                  intensity={lookingFor === "groups" ? 40 : 10} 
+                  tint="dark" 
                   style={[
-                    styles.lookingForText,
-                    lookingFor === "groups" && styles.lookingForTextActive,
+                    styles.lookingForButton,
+                    lookingFor === "groups" && styles.lookingForButtonActive
                   ]}
                 >
-                  Groups
-                </Text>
+                  <Users
+                    size={24}
+                    color={
+                      lookingFor === "groups" ? Colors.aquaGlow : Colors.textSecondary
+                    }
+                  />
+                  <Text
+                    style={[
+                      styles.lookingForText,
+                      lookingFor === "groups" && styles.lookingForTextActive,
+                    ]}
+                  >
+                    Groups
+                  </Text>
+                </BlurView>
               </TouchableOpacity>
             </View>
           </View>
@@ -501,41 +527,62 @@ export default function EditProfileScreen() {
               {availableInterests.map((interest) => (
                 <TouchableOpacity
                   key={interest}
-                  style={[
-                    styles.interestChip,
-                    selectedInterests.includes(interest) &&
-                      styles.interestChipSelected,
-                  ]}
+                  style={styles.interestChipWrapper}
                   onPress={() => toggleInterest(interest)}
                 >
-                  <Text
+                  <BlurView
+                    intensity={selectedInterests.includes(interest) ? 40 : 10}
+                    tint="dark"
                     style={[
-                      styles.interestChipText,
+                      styles.interestChip,
                       selectedInterests.includes(interest) &&
-                        styles.interestChipTextSelected,
+                        styles.interestChipSelected,
                     ]}
                   >
-                    {interest}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.interestChipText,
+                        selectedInterests.includes(interest) &&
+                          styles.interestChipTextSelected,
+                      ]}
+                    >
+                      {interest}
+                    </Text>
+                  </BlurView>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
 
           <TouchableOpacity style={styles.saveButtonLarge} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save Changes</Text>
+            <LinearGradient
+              colors={[Colors.babyBlue, Colors.aquaGlow]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.saveButtonGradient}
+            >
+              <Text style={styles.saveButtonText}>Save Changes</Text>
+            </LinearGradient>
           </TouchableOpacity>
 
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.background,
+  },
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
   },
   safeArea: {
     flex: 1,
@@ -547,22 +594,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
   },
-  backButton: {
+  headerButton: {
     width: 40,
     height: 40,
-    alignItems: "center",
-    justifyContent: "center",
+    borderRadius: 20,
+    overflow: 'hidden',
   },
-  saveButton: {
-    width: 40,
-    height: 40,
+  headerButtonBlur: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: "700" as const,
-    color: Colors.charcoal,
+    fontWeight: "700",
+    color: Colors.white,
   },
   scrollView: {
     flex: 1,
@@ -585,15 +633,12 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.glass,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 4,
     overflow: "hidden",
+    borderWidth: 2,
+    borderColor: Colors.glassBorder,
   },
   avatarImage: {
     width: "100%",
@@ -606,44 +651,38 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.softPurple,
+    overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: Colors.background,
+  },
+  cameraButtonGradient: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 3,
-    borderColor: Colors.white,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   changePhotoText: {
     fontSize: 16,
-    fontWeight: "600" as const,
-    color: Colors.softPurple,
+    fontWeight: "600",
+    color: Colors.babyBlue,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "700" as const,
-    color: Colors.charcoal,
+    fontWeight: "700",
+    color: Colors.white,
     marginBottom: 12,
   },
   sectionDescription: {
     fontSize: 14,
-    fontWeight: "500" as const,
-    color: Colors.charcoal,
-    opacity: 0.6,
+    fontWeight: "500",
+    color: Colors.textSecondary,
+    opacity: 0.8,
     marginBottom: 12,
   },
   card: {
-    backgroundColor: Colors.white,
     borderRadius: 16,
     overflow: "hidden",
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   settingRow: {
     flexDirection: "row",
@@ -662,19 +701,18 @@ const styles = StyleSheet.create({
   },
   settingTitle: {
     fontSize: 16,
-    fontWeight: "600" as const,
-    color: Colors.charcoal,
+    fontWeight: "600",
+    color: Colors.white,
     marginBottom: 2,
   },
   settingDescription: {
     fontSize: 13,
-    fontWeight: "500" as const,
-    color: Colors.charcoal,
-    opacity: 0.6,
+    fontWeight: "500",
+    color: Colors.textSecondary,
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.lightGray,
+    backgroundColor: Colors.glassBorder,
     marginLeft: 52,
   },
   inputRow: {
@@ -688,15 +726,14 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 13,
-    fontWeight: "600" as const,
-    color: Colors.charcoal,
-    opacity: 0.6,
+    fontWeight: "600",
+    color: Colors.textSecondary,
     marginBottom: 4,
   },
   input: {
     fontSize: 16,
-    fontWeight: "600" as const,
-    color: Colors.charcoal,
+    fontWeight: "600",
+    color: Colors.white,
     padding: 0,
   },
   readOnlyInputContainer: {
@@ -706,15 +743,15 @@ const styles = StyleSheet.create({
   },
   readOnlyInput: {
     fontSize: 16,
-    fontWeight: "600" as const,
-    color: Colors.charcoal,
+    fontWeight: "600",
+    color: Colors.textSecondary,
     opacity: 0.7,
   },
   lockedBadge: {
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: Colors.lightGray,
+    backgroundColor: Colors.glassLight,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -722,81 +759,78 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
   },
+  lookingForButtonWrapper: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: "hidden",
+  },
   lookingForButton: {
     flex: 1,
-    backgroundColor: Colors.white,
-    borderRadius: 16,
     padding: 16,
     alignItems: "center",
     gap: 8,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
-    borderWidth: 2,
-    borderColor: "transparent",
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   lookingForButtonActive: {
-    backgroundColor: Colors.softPurple,
-    borderColor: Colors.charcoal,
+    backgroundColor: Colors.glassLight,
+    borderColor: Colors.babyBlue,
   },
   lookingForText: {
     fontSize: 14,
-    fontWeight: "600" as const,
-    color: Colors.charcoal,
+    fontWeight: "600",
+    color: Colors.textSecondary,
   },
   lookingForTextActive: {
     color: Colors.white,
-    fontWeight: "700" as const,
+    fontWeight: "700",
   },
   interestsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 12,
   },
+  interestChipWrapper: {
+    borderRadius: 20,
+    overflow: "hidden",
+  },
   interestChip: {
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 2,
-    borderWidth: 2,
-    borderColor: "transparent",
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   interestChipSelected: {
-    backgroundColor: Colors.softPink,
-    borderColor: Colors.charcoal,
+    backgroundColor: Colors.glassLight,
+    borderColor: Colors.pastelYellow,
   },
   interestChipText: {
     fontSize: 14,
-    fontWeight: "600" as const,
-    color: Colors.charcoal,
-    opacity: 0.7,
+    fontWeight: "600",
+    color: Colors.textSecondary,
   },
   interestChipTextSelected: {
-    opacity: 1,
-    fontWeight: "700" as const,
+    color: Colors.white,
+    fontWeight: "700",
   },
   saveButtonLarge: {
-    backgroundColor: Colors.softPurple,
     borderRadius: 16,
-    padding: 18,
-    alignItems: "center",
-    shadowColor: Colors.shadowDark,
+    overflow: "hidden",
+    marginTop: 24,
+    shadowColor: Colors.babyBlue,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 1,
+    shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 4,
   },
+  saveButtonGradient: {
+    padding: 18,
+    alignItems: "center",
+  },
   saveButtonText: {
     fontSize: 18,
-    fontWeight: "700" as const,
-    color: Colors.white,
+    fontWeight: "700",
+    color: Colors.charcoal,
   },
   bottomSpacer: {
     height: 40,
@@ -809,7 +843,7 @@ const styles = StyleSheet.create({
   },
   tiktokIcon: {
     fontSize: 20,
-    fontWeight: "700" as const,
-    color: Colors.charcoal,
+    fontWeight: "700",
+    color: Colors.textSecondary,
   },
 });
