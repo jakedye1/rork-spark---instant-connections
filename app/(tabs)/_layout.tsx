@@ -9,49 +9,75 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.charcoal,
-        tabBarInactiveTintColor: Colors.mediumGray,
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.textTertiary,
         tabBarStyle: {
-          backgroundColor: Colors.white,
-          borderTopWidth: 0,
+          backgroundColor: Colors.surface,
+          borderTopWidth: 1,
+          borderTopColor: Colors.border,
+          height: Platform.OS === 'ios' ? 88 : 68,
+          paddingTop: 8,
+          paddingBottom: Platform.OS === 'ios' ? 24 : 8,
           ...(Platform.OS === 'ios' ? {
             shadowColor: Colors.shadowDark,
             shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: 0.1,
-            shadowRadius: 12,
+            shadowOpacity: 0.15,
+            shadowRadius: 16,
           } : {
-            elevation: 8,
+            elevation: 16,
           }),
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: "600" as const,
+          fontWeight: "700" as const,
+          letterSpacing: 0.3,
         },
         tabBarHideOnKeyboard: Platform.OS !== 'ios',
+        tabBarItemStyle: {
+          paddingVertical: 4,
+        },
       }}
     >
       <Tabs.Screen
         name="home"
         options={{
           title: "Flare",
-          tabBarIcon: ({ color }) => <Flame size={24} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <Flame 
+              size={focused ? 28 : 24} 
+              color={color} 
+              fill={focused ? color : "transparent"}
+              strokeWidth={focused ? 2.5 : 2}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="groups"
         options={{
-          title: "What's the Plan",
-          tabBarIcon: ({ color }) => <MessageCircle size={24} color={color} />,
+          title: "Messages",
+          tabBarIcon: ({ color, focused }) => (
+            <MessageCircle 
+              size={focused ? 28 : 24} 
+              color={color}
+              strokeWidth={focused ? 2.5 : 2}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
-          tabBarIcon: ({ color }) => <User size={24} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <User 
+              size={focused ? 28 : 24} 
+              color={color}
+              strokeWidth={focused ? 2.5 : 2}
+            />
+          ),
         }}
       />
-
     </Tabs>
   );
 }

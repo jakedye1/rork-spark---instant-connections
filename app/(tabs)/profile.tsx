@@ -9,6 +9,8 @@ import {
   LogOut,
   Users,
   ChevronRight,
+  Edit3,
+  Zap,
 } from "lucide-react-native";
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -80,211 +82,236 @@ export default function ProfileScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={[Colors.babyBlue, Colors.pastelYellow]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
-        showsVerticalScrollIndicator={false}
-        keyboardDismissMode="on-drag"
+    <View style={styles.container}>
+      <LinearGradient
+        colors={[Colors.background, Colors.backgroundLight]}
+        style={styles.gradient}
       >
-        <View style={styles.profileHeader}>
-          <View style={styles.avatarContainer}>
-            <View style={styles.avatar}>
-              <User size={48} color={Colors.charcoal} />
-            </View>
-            <View style={styles.verifiedBadge}>
-              <Shield size={16} color={Colors.white} />
-            </View>
-          </View>
-
-          <Text style={styles.name}>{user?.name || "User"}</Text>
-          <Text style={styles.age}>{user?.age ? `${user.age} years old` : "Age not set"}</Text>
-
-          <View style={styles.interestsContainer}>
-            {(user?.interests || []).map((interest) => (
-              <View key={interest} style={styles.interestTag}>
-                <Text style={styles.interestText}>{interest}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        <TouchableOpacity 
-          style={styles.premiumCard} 
-          onPress={handlePremiumPress}
-          activeOpacity={0.8}
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
+          showsVerticalScrollIndicator={false}
+          keyboardDismissMode="on-drag"
         >
-          <LinearGradient
-            colors={[Colors.pastelYellow, "#FFE680"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.premiumGradient}
-          >
-            <Crown size={32} color={Colors.charcoal} />
-            <View style={styles.premiumTextContainer}>
-              <Text style={styles.premiumTitle}>Upgrade to Premium</Text>
-              <Text style={styles.premiumSubtitle}>
-                Unlimited calls • Ad-free • Priority matching
-              </Text>
+          <View style={styles.profileHeader}>
+            <View style={styles.avatarContainer}>
+              <LinearGradient
+                colors={Colors.gradientHero as [string, string, ...string[]]}
+                style={styles.avatar}
+              >
+                <User size={52} color={Colors.white} strokeWidth={2} />
+              </LinearGradient>
+              <View style={styles.verifiedBadge}>
+                <Shield size={16} color={Colors.white} strokeWidth={2.5} />
+              </View>
+              <TouchableOpacity 
+                style={styles.editBadge}
+                onPress={() => router.push('/edit-profile')}
+              >
+                <Edit3 size={14} color={Colors.white} strokeWidth={2.5} />
+              </TouchableOpacity>
             </View>
-          </LinearGradient>
-        </TouchableOpacity>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Dating Preferences</Text>
+            <Text style={styles.name}>{user?.name || "User"}</Text>
+            <Text style={styles.age}>{user?.age ? `${user.age} years old` : "Age not set"}</Text>
 
-          <View style={styles.preferenceCard}>
-            <View style={styles.preferenceHeader}>
-              <Users size={24} color={Colors.charcoal} />
-              <Text style={styles.preferenceTitle}>I want to meet</Text>
-            </View>
-            <View style={styles.preferenceOptions}>
-              <TouchableOpacity
-                style={[
-                  styles.preferenceButton,
-                  user?.genderPreference === "female" && styles.preferenceButtonActive,
-                ]}
-                onPress={() => handleGenderPreferenceChange("female")}
+            {(user?.interests && user.interests.length > 0) && (
+              <View style={styles.interestsContainer}>
+                {user.interests.map((interest) => (
+                  <View key={interest} style={styles.interestTag}>
+                    <Text style={styles.interestText}>{interest}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+
+          {!user?.isPremium && (
+            <TouchableOpacity 
+              style={styles.premiumCard} 
+              onPress={handlePremiumPress}
+              activeOpacity={0.9}
+            >
+              <LinearGradient
+                colors={Colors.gradientPremium as [string, string, ...string[]]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.premiumGradient}
               >
-                <Text
+                <View style={styles.premiumContent}>
+                  <View style={styles.premiumIcon}>
+                    <Zap size={36} color={Colors.white} fill={Colors.white} strokeWidth={2} />
+                  </View>
+                  <View style={styles.premiumTextContainer}>
+                    <View style={styles.premiumTitleRow}>
+                      <Text style={styles.premiumTitle}>Go Premium</Text>
+                      <Crown size={20} color={Colors.white} strokeWidth={2} />
+                    </View>
+                    <Text style={styles.premiumSubtitle}>
+                      Unlimited flares • Priority matches • No ads
+                    </Text>
+                  </View>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Preferences</Text>
+
+            <View style={styles.preferenceCard}>
+              <View style={styles.preferenceHeader}>
+                <Users size={24} color={Colors.primary} strokeWidth={2} />
+                <Text style={styles.preferenceTitle}>Looking for</Text>
+              </View>
+              <View style={styles.preferenceOptions}>
+                <TouchableOpacity
                   style={[
-                    styles.preferenceButtonText,
-                    user?.genderPreference === "female" && styles.preferenceButtonTextActive,
+                    styles.preferenceButton,
+                    user?.genderPreference === "female" && styles.preferenceButtonActive,
                   ]}
+                  onPress={() => handleGenderPreferenceChange("female")}
                 >
-                  Female
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.preferenceButton,
-                  user?.genderPreference === "male" && styles.preferenceButtonActive,
-                ]}
-                onPress={() => handleGenderPreferenceChange("male")}
-              >
-                <Text
+                  <Text
+                    style={[
+                      styles.preferenceButtonText,
+                      user?.genderPreference === "female" && styles.preferenceButtonTextActive,
+                    ]}
+                  >
+                    Female
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                   style={[
-                    styles.preferenceButtonText,
-                    user?.genderPreference === "male" && styles.preferenceButtonTextActive,
+                    styles.preferenceButton,
+                    user?.genderPreference === "male" && styles.preferenceButtonActive,
                   ]}
+                  onPress={() => handleGenderPreferenceChange("male")}
                 >
-                  Male
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.preferenceButton,
-                  user?.genderPreference === "other" && styles.preferenceButtonActive,
-                ]}
-                onPress={() => handleGenderPreferenceChange("other")}
-              >
-                <Text
+                  <Text
+                    style={[
+                      styles.preferenceButtonText,
+                      user?.genderPreference === "male" && styles.preferenceButtonTextActive,
+                    ]}
+                  >
+                    Male
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                   style={[
-                    styles.preferenceButtonText,
-                    user?.genderPreference === "other" && styles.preferenceButtonTextActive,
+                    styles.preferenceButton,
+                    user?.genderPreference === "other" && styles.preferenceButtonActive,
                   ]}
+                  onPress={() => handleGenderPreferenceChange("other")}
                 >
-                  Other
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.preferenceButton,
-                  user?.genderPreference === "everyone" && styles.preferenceButtonActive,
-                ]}
-                onPress={() => handleGenderPreferenceChange("everyone")}
-              >
-                <Text
+                  <Text
+                    style={[
+                      styles.preferenceButtonText,
+                      user?.genderPreference === "other" && styles.preferenceButtonTextActive,
+                    ]}
+                  >
+                    Other
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                   style={[
-                    styles.preferenceButtonText,
-                    user?.genderPreference === "everyone" && styles.preferenceButtonTextActive,
+                    styles.preferenceButton,
+                    user?.genderPreference === "everyone" && styles.preferenceButtonActive,
                   ]}
+                  onPress={() => handleGenderPreferenceChange("everyone")}
                 >
-                  Everyone
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.preferenceButtonText,
+                      user?.genderPreference === "everyone" && styles.preferenceButtonTextActive,
+                    ]}
+                  >
+                    Everyone
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Settings</Text>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Settings</Text>
 
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => {
-              console.log('Account Settings pressed - navigating to settings');
-              router.push('/settings');
-            }}
-          >
-            <View style={styles.menuItemLeft}>
-              <Settings size={24} color={Colors.charcoal} />
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => {
+                console.log('Account Settings pressed - navigating to settings');
+                router.push('/settings');
+              }}
+            >
+              <View style={[styles.menuIconContainer, { backgroundColor: Colors.primary + "20" }]}>
+                <Settings size={22} color={Colors.primary} strokeWidth={2} />
+              </View>
               <Text style={styles.menuItemText}>Account Settings</Text>
-            </View>
-            <ChevronRight size={20} color={Colors.mediumGray} />
-          </TouchableOpacity>
+              <ChevronRight size={20} color={Colors.textTertiary} />
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => {
-              console.log('Notifications pressed - navigating to notifications');
-              router.push('/notifications');
-            }}
-          >
-            <View style={styles.menuItemLeft}>
-              <Bell size={24} color={Colors.charcoal} />
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => {
+                console.log('Notifications pressed - navigating to notifications');
+                router.push('/notifications');
+              }}
+            >
+              <View style={[styles.menuIconContainer, { backgroundColor: Colors.accent + "20" }]}>
+                <Bell size={22} color={Colors.accent} strokeWidth={2} />
+              </View>
               <Text style={styles.menuItemText}>Notifications</Text>
-            </View>
-            <ChevronRight size={20} color={Colors.mediumGray} />
-          </TouchableOpacity>
+              <ChevronRight size={20} color={Colors.textTertiary} />
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => {
-              console.log('Privacy & Safety pressed - navigating to privacy-safety');
-              router.push('/privacy-safety');
-            }}
-          >
-            <View style={styles.menuItemLeft}>
-              <Shield size={24} color={Colors.charcoal} />
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => {
+                console.log('Privacy & Safety pressed - navigating to privacy-safety');
+                router.push('/privacy-safety');
+              }}
+            >
+              <View style={[styles.menuIconContainer, { backgroundColor: Colors.success + "20" }]}>
+                <Shield size={22} color={Colors.success} strokeWidth={2} />
+              </View>
               <Text style={styles.menuItemText}>Privacy & Safety</Text>
-            </View>
-            <ChevronRight size={20} color={Colors.mediumGray} />
-          </TouchableOpacity>
+              <ChevronRight size={20} color={Colors.textTertiary} />
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => {
-              console.log('Help & Support pressed - navigating to help-support');
-              router.push('/help-support' as any);
-            }}
-          >
-            <View style={styles.menuItemLeft}>
-              <HelpCircle size={24} color={Colors.charcoal} />
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={() => {
+                console.log('Help & Support pressed - navigating to help-support');
+                router.push('/help-support' as any);
+              }}
+            >
+              <View style={[styles.menuIconContainer, { backgroundColor: Colors.info + "20" }]}>
+                <HelpCircle size={22} color={Colors.info} strokeWidth={2} />
+              </View>
               <Text style={styles.menuItemText}>Help & Support</Text>
+              <ChevronRight size={20} color={Colors.textTertiary} />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
+            <View style={[styles.menuIconContainer, { backgroundColor: Colors.error + "20" }]}>
+              <LogOut size={20} color={Colors.error} strokeWidth={2} />
             </View>
-            <ChevronRight size={20} color={Colors.mediumGray} />
+            <Text style={styles.logoutText}>Sign Out</Text>
           </TouchableOpacity>
-        </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-          <LogOut size={20} color={Colors.charcoal} />
-          <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity>
-
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
-    </LinearGradient>
+          <View style={styles.bottomSpacer} />
+        </ScrollView>
+      </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  gradient: {
     flex: 1,
   },
   scrollView: {
@@ -299,204 +326,220 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   avatarContainer: {
-    position: "relative",
-    marginBottom: 16,
+    position: "relative" as const,
+    marginBottom: 20,
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: Colors.white,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
   },
   verifiedBadge: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.softGreen,
+    position: "absolute" as const,
+    bottom: 4,
+    right: 4,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.success,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 3,
-    borderColor: Colors.white,
+    borderColor: Colors.background,
+  },
+  editBadge: {
+    position: "absolute" as const,
+    bottom: 4,
+    left: 4,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 3,
+    borderColor: Colors.background,
   },
   name: {
-    fontSize: 28,
-    fontWeight: "700" as const,
-    color: Colors.charcoal,
-    marginBottom: 4,
+    fontSize: 32,
+    fontWeight: "800" as const,
+    color: Colors.text,
+    marginBottom: 6,
+    letterSpacing: -1,
   },
   age: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "500" as const,
-    color: Colors.charcoal,
-    opacity: 0.7,
-    marginBottom: 16,
+    color: Colors.textSecondary,
+    marginBottom: 20,
   },
   interestsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 10,
     justifyContent: "center",
   },
   interestTag: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: Colors.white,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: Colors.surface,
     borderRadius: 16,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   interestText: {
     fontSize: 14,
-    fontWeight: "500" as const,
-    color: Colors.charcoal,
+    fontWeight: "600" as const,
+    color: Colors.text,
   },
   premiumCard: {
-    borderRadius: 16,
+    borderRadius: 24,
     overflow: "hidden",
     marginBottom: 32,
-    shadowColor: Colors.shadowDark,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 8,
   },
   premiumGradient: {
+    padding: 24,
+  },
+  premiumContent: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 20,
-    gap: 16,
+    gap: 18,
+  },
+  premiumIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   premiumTextContainer: {
     flex: 1,
   },
+  premiumTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 6,
+  },
   premiumTitle: {
-    fontSize: 18,
-    fontWeight: "700" as const,
-    color: Colors.charcoal,
-    marginBottom: 4,
+    fontSize: 22,
+    fontWeight: "800" as const,
+    color: Colors.white,
+    letterSpacing: -0.5,
   },
   premiumSubtitle: {
     fontSize: 14,
     fontWeight: "500" as const,
-    color: Colors.charcoal,
-    opacity: 0.7,
+    color: Colors.white,
+    opacity: 0.9,
   },
   section: {
     marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700" as const,
-    color: Colors.charcoal,
+    color: Colors.text,
     marginBottom: 16,
   },
   menuItem: {
-    backgroundColor: Colors.white,
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: 18,
+    padding: 18,
     marginBottom: 12,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: 14,
   },
-  menuItemLeft: {
-    flexDirection: "row",
+  menuIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: "center",
-    gap: 12,
-    flex: 1,
+    justifyContent: "center",
   },
   menuItemText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "600" as const,
-    color: Colors.charcoal,
+    color: Colors.text,
+    flex: 1,
   },
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    backgroundColor: Colors.white,
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
+    gap: 14,
+    backgroundColor: Colors.surface,
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: Colors.error + "40",
   },
   logoutText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "600" as const,
-    color: Colors.charcoal,
+    color: Colors.error,
+    flex: 1,
   },
   bottomSpacer: {
     height: 20,
   },
   preferenceCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
     padding: 20,
-    marginBottom: 16,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   preferenceHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    marginBottom: 16,
+    marginBottom: 18,
   },
   preferenceTitle: {
     fontSize: 18,
     fontWeight: "700" as const,
-    color: Colors.charcoal,
+    color: Colors.text,
   },
   preferenceOptions: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 10,
   },
   preferenceButton: {
     paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 20,
-    backgroundColor: Colors.babyBlue,
+    paddingVertical: 14,
+    borderRadius: 16,
+    backgroundColor: Colors.backgroundElevated,
     borderWidth: 2,
-    borderColor: "transparent",
+    borderColor: Colors.border,
   },
   preferenceButtonActive: {
-    backgroundColor: Colors.softPink,
-    borderColor: Colors.charcoal,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   preferenceButtonText: {
     fontSize: 15,
     fontWeight: "600" as const,
-    color: Colors.charcoal,
-    opacity: 0.7,
+    color: Colors.textSecondary,
   },
   preferenceButtonTextActive: {
-    opacity: 1,
+    color: Colors.white,
     fontWeight: "700" as const,
   },
 });

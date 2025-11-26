@@ -64,9 +64,7 @@ export default function AuthScreen() {
 
   return (
     <LinearGradient
-      colors={[Colors.babyBlue, Colors.pastelYellow]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+      colors={Colors.gradientDark as [string, string, ...string[]]}
       style={styles.container}
     >
       <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
@@ -76,9 +74,12 @@ export default function AuthScreen() {
         >
           <View style={styles.content}>
             <View style={styles.logoContainer}>
-              <View style={styles.logoCircle}>
-                <Sparkles size={48} color={Colors.charcoal} />
-              </View>
+              <LinearGradient
+                colors={Colors.gradientHero as [string, string, ...string[]]}
+                style={styles.logoCircle}
+              >
+                <Sparkles size={56} color={Colors.white} strokeWidth={2} />
+              </LinearGradient>
               <Text style={styles.logoText}>Spark</Text>
               <Text style={styles.tagline}>Real connections, instantly</Text>
             </View>
@@ -88,11 +89,13 @@ export default function AuthScreen() {
 
               <View style={styles.inputContainer}>
                 <View style={styles.inputWrapper}>
-                  <Mail size={20} color={Colors.mediumGray} style={styles.inputIcon} />
+                  <View style={styles.iconContainer}>
+                    <Mail size={20} color={Colors.textSecondary} />
+                  </View>
                   <TextInput
                     style={styles.input}
                     placeholder="Email"
-                    placeholderTextColor={Colors.mediumGray}
+                    placeholderTextColor={Colors.textTertiary}
                     value={email}
                     onChangeText={setEmail}
                     autoCapitalize="none"
@@ -103,11 +106,13 @@ export default function AuthScreen() {
                 </View>
 
                 <View style={styles.inputWrapper}>
-                  <Lock size={20} color={Colors.mediumGray} style={styles.inputIcon} />
+                  <View style={styles.iconContainer}>
+                    <Lock size={20} color={Colors.textSecondary} />
+                  </View>
                   <TextInput
                     style={styles.input}
                     placeholder="Password"
-                    placeholderTextColor={Colors.mediumGray}
+                    placeholderTextColor={Colors.textTertiary}
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry
@@ -118,11 +123,13 @@ export default function AuthScreen() {
 
                 {isSignUp && (
                   <View style={styles.inputWrapper}>
-                    <Lock size={20} color={Colors.mediumGray} style={styles.inputIcon} />
+                    <View style={styles.iconContainer}>
+                      <Lock size={20} color={Colors.textSecondary} />
+                    </View>
                     <TextInput
                       style={styles.input}
                       placeholder="Confirm Password"
-                      placeholderTextColor={Colors.mediumGray}
+                      placeholderTextColor={Colors.textTertiary}
                       value={confirmPassword}
                       onChangeText={setConfirmPassword}
                       secureTextEntry
@@ -138,9 +145,16 @@ export default function AuthScreen() {
                 onPress={handleAuth}
                 disabled={isLoading}
               >
-                <Text style={styles.authButtonText}>
-                  {isLoading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
-                </Text>
+                <LinearGradient
+                  colors={Colors.gradient1 as [string, string, ...string[]]}
+                  style={styles.authButtonGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Text style={styles.authButtonText}>
+                    {isLoading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
 
               {!isSignUp && (
@@ -185,43 +199,43 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginBottom: 48,
+    marginBottom: 60,
   },
   logoCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: Colors.pastelYellow,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
-    shadowColor: Colors.pastelYellow,
-    shadowOffset: { width: 0, height: 0 },
+    marginBottom: 24,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowRadius: 24,
+    elevation: 12,
   },
   logoText: {
-    fontSize: 36,
-    fontWeight: "700" as const,
-    color: Colors.charcoal,
+    fontSize: 48,
+    fontWeight: "800" as const,
+    color: Colors.text,
     marginBottom: 8,
+    letterSpacing: -2,
   },
   tagline: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "500" as const,
-    color: Colors.charcoal,
-    opacity: 0.7,
+    color: Colors.textSecondary,
   },
   formContainer: {
     width: "100%",
   },
   title: {
-    fontSize: 28,
-    fontWeight: "700" as const,
-    color: Colors.charcoal,
-    marginBottom: 24,
+    fontSize: 32,
+    fontWeight: "800" as const,
+    color: Colors.text,
+    marginBottom: 32,
     textAlign: "center",
+    letterSpacing: -1,
   },
   inputContainer: {
     gap: 16,
@@ -230,67 +244,67 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Colors.white,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    height: 56,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    paddingHorizontal: 18,
+    height: 60,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
-  inputIcon: {
-    marginRight: 12,
+  iconContainer: {
+    marginRight: 14,
   },
   input: {
     flex: 1,
     fontSize: 16,
-    color: Colors.charcoal,
+    color: Colors.text,
+    fontWeight: "500" as const,
   },
   authButton: {
-    height: 56,
-    backgroundColor: Colors.pastelYellow,
-    borderRadius: 28,
+    height: 60,
+    borderRadius: 30,
+    overflow: "hidden",
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  authButtonGradient: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: Colors.pastelYellow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 4,
   },
   authButtonText: {
     fontSize: 18,
     fontWeight: "700" as const,
-    color: Colors.charcoal,
+    color: Colors.white,
+    letterSpacing: 0.5,
   },
   forgotPassword: {
     alignItems: "center",
-    marginTop: 16,
+    marginTop: 20,
   },
   forgotPasswordText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "600" as const,
-    color: Colors.charcoal,
-    opacity: 0.7,
+    color: Colors.textSecondary,
   },
   switchContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 24,
+    marginTop: 32,
     gap: 8,
   },
   switchText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "500" as const,
-    color: Colors.charcoal,
-    opacity: 0.7,
+    color: Colors.textSecondary,
   },
   switchButton: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "700" as const,
-    color: Colors.charcoal,
+    color: Colors.primary,
   },
 });

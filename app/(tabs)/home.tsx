@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { Flame, Heart, Users as UsersIcon, Users2, Sparkles, TrendingUp } from "lucide-react-native";
+import { Flame, Heart, Users as UsersIcon, Users2, Sparkles, TrendingUp, Zap } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -35,25 +35,25 @@ export default function HomeScreen() {
       Animated.sequence([
         Animated.parallel([
           Animated.timing(scaleAnim, {
-            toValue: 1.03,
-            duration: 2000,
+            toValue: 1.05,
+            duration: 2500,
             useNativeDriver: true,
           }),
           Animated.timing(glowAnim, {
             toValue: 1,
-            duration: 2000,
+            duration: 2500,
             useNativeDriver: true,
           }),
         ]),
         Animated.parallel([
           Animated.timing(scaleAnim, {
             toValue: 1,
-            duration: 2000,
+            duration: 2500,
             useNativeDriver: true,
           }),
           Animated.timing(glowAnim, {
             toValue: 0,
-            duration: 2000,
+            duration: 2500,
             useNativeDriver: true,
           }),
         ]),
@@ -126,14 +126,14 @@ export default function HomeScreen() {
         };
       case "friends":
         return {
-          gradient: Colors.gradient3,
+          gradient: Colors.gradient2,
           title: "Make New Friends",
           subtitle: "Meet amazing people through live video chat",
           icon: UsersIcon,
         };
       case "groups":
         return {
-          gradient: Colors.gradient4,
+          gradient: Colors.gradient3,
           title: "Group Hangout",
           subtitle: "Meet another friend group and plan something fun",
           icon: Users2,
@@ -148,7 +148,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[Colors.background, Colors.backgroundDark]}
+        colors={[Colors.background, Colors.backgroundLight]}
         style={styles.gradient}
       >
         <ScrollView
@@ -159,19 +159,22 @@ export default function HomeScreen() {
         >
           <View style={styles.header}>
             <View>
-              <Text style={styles.greeting}>Hey there! 👋</Text>
+              <Text style={styles.greeting}>Welcome back</Text>
               <Text style={styles.appName}>Spark</Text>
             </View>
             <TouchableOpacity style={styles.callsCounter} onPress={handlePremiumPress}>
-              <View style={styles.callsIconContainer}>
-                <Flame size={18} color={Colors.primary} />
-              </View>
-              <View>
-                <Text style={styles.callsLabel}>Calls</Text>
-                <Text style={styles.callsValue}>
-                  {user?.isPremium ? '∞' : callsRemaining}
-                </Text>
-              </View>
+              <LinearGradient
+                colors={Colors.gradientPremium as [string, string, ...string[]]}
+                style={styles.callsGradient}
+              >
+                <Flame size={20} color={Colors.white} />
+                <View>
+                  <Text style={styles.callsLabel}>Flares</Text>
+                  <Text style={styles.callsValue}>
+                    {user?.isPremium ? '∞' : callsRemaining}
+                  </Text>
+                </View>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
 
@@ -250,13 +253,13 @@ export default function HomeScreen() {
                   ]}
                 >
                   <View style={styles.heroIcon}>
-                    <ModeIcon size={40} color={Colors.white} strokeWidth={2.5} />
+                    <ModeIcon size={48} color={Colors.white} strokeWidth={2.5} />
                   </View>
                   <Text style={styles.heroTitle}>{config.title}</Text>
                   <Text style={styles.heroSubtitle}>{config.subtitle}</Text>
                   
                   <View style={styles.startButton}>
-                    <Sparkles size={20} color={Colors.white} />
+                    <Sparkles size={22} color={Colors.primary} strokeWidth={2.5} />
                     <Text style={styles.startButtonText}>Start Now</Text>
                   </View>
                 </Animated.View>
@@ -267,7 +270,7 @@ export default function HomeScreen() {
                     {
                       opacity: glowAnim.interpolate({
                         inputRange: [0, 1],
-                        outputRange: [0.2, 0.4],
+                        outputRange: [0, 0.15],
                       }),
                     },
                   ]}
@@ -279,9 +282,9 @@ export default function HomeScreen() {
           {activeChats.length > 0 && (
             <View style={styles.chatsSection}>
               <View style={styles.chatsSectionHeader}>
-                <Text style={styles.chatsSectionTitle}>Active Chats</Text>
+                <Text style={styles.chatsSectionTitle}>Active Connections</Text>
                 <TouchableOpacity onPress={() => router.push('/(tabs)/groups')}>
-                  <Text style={styles.chatsSectionAction}>See All</Text>
+                  <Text style={styles.chatsSectionAction}>View All</Text>
                 </TouchableOpacity>
               </View>
               
@@ -300,40 +303,34 @@ export default function HomeScreen() {
                       router.push('/(tabs)/groups');
                     }}
                   >
-                    <View style={styles.chatCardHeader}>
-                      <View style={[
-                        styles.chatCardIcon,
-                        chat.type === "date" && styles.chatCardIconDate,
-                        chat.type === "group" && styles.chatCardIconGroup,
-                        chat.type === "friend" && styles.chatCardIconFriend,
-                      ]}>
+                    <LinearGradient
+                      colors={
+                        chat.type === "date" 
+                          ? Colors.gradient1 as [string, string, ...string[]]
+                          : chat.type === "group"
+                          ? Colors.gradient3 as [string, string, ...string[]]
+                          : Colors.gradient2 as [string, string, ...string[]]
+                      }
+                      style={styles.chatCardGradient}
+                    >
+                      <View style={styles.chatCardHeader}>
                         <Text style={styles.chatCardEmoji}>
                           {chat.type === "date" ? "💖" : chat.type === "group" ? "👥" : "🫂"}
                         </Text>
-                      </View>
-                      {chat.type === "date" && (
                         <View style={styles.chatCardBadge}>
-                          <Text style={styles.chatCardBadgeText}>Date</Text>
+                          <Text style={styles.chatCardBadgeText}>
+                            {chat.type === "date" ? "Date" : chat.type === "group" ? "Group" : "Friend"}
+                          </Text>
                         </View>
+                      </View>
+                      <Text style={styles.chatCardName} numberOfLines={1}>{chat.name}</Text>
+                      {chat.lastMessage && (
+                        <Text style={styles.chatCardMessage} numberOfLines={2}>{chat.lastMessage}</Text>
                       )}
-                      {chat.type === "group" && (
-                        <View style={[styles.chatCardBadge, styles.chatCardBadgeGroup]}>
-                          <Text style={styles.chatCardBadgeText}>Group</Text>
-                        </View>
-                      )}
-                      {chat.type === "friend" && (
-                        <View style={[styles.chatCardBadge, styles.chatCardBadgeFriend]}>
-                          <Text style={styles.chatCardBadgeText}>Friend</Text>
-                        </View>
-                      )}
-                    </View>
-                    <Text style={styles.chatCardName} numberOfLines={1}>{chat.name}</Text>
-                    {chat.lastMessage && (
-                      <Text style={styles.chatCardMessage} numberOfLines={2}>{chat.lastMessage}</Text>
-                    )}
-                    <Text style={styles.chatCardTime}>
-                      {chat.lastMessageTime ? new Date(chat.lastMessageTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Just now"}
-                    </Text>
+                      <Text style={styles.chatCardTime}>
+                        {chat.lastMessageTime ? new Date(chat.lastMessageTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Just now"}
+                      </Text>
+                    </LinearGradient>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
@@ -341,35 +338,35 @@ export default function HomeScreen() {
           )}
 
           <View style={styles.featuresSection}>
-            <Text style={styles.featuresSectionTitle}>Why Spark?</Text>
+            <Text style={styles.featuresSectionTitle}>Why Choose Spark?</Text>
             <View style={styles.featuresGrid}>
               <View style={styles.featureCard}>
-                <View style={styles.featureIconContainer}>
-                  <Sparkles size={24} color={Colors.accent} />
+                <View style={[styles.featureIconContainer, { backgroundColor: Colors.accent + "20" }]}>
+                  <Sparkles size={26} color={Colors.accent} strokeWidth={2.5} />
                 </View>
                 <Text style={styles.featureTitle}>AI Matching</Text>
                 <Text style={styles.featureDescription}>
-                  Smart algorithm finds your perfect match
+                  Smart algorithm finds perfect matches
                 </Text>
               </View>
 
               <View style={styles.featureCard}>
-                <View style={styles.featureIconContainer}>
-                  <TrendingUp size={24} color={Colors.success} />
+                <View style={[styles.featureIconContainer, { backgroundColor: Colors.success + "20" }]}>
+                  <TrendingUp size={26} color={Colors.success} strokeWidth={2.5} />
                 </View>
                 <Text style={styles.featureTitle}>Real-Time</Text>
                 <Text style={styles.featureDescription}>
-                  Instant video connections, no waiting
+                  Instant connections, no waiting
                 </Text>
               </View>
 
               <View style={styles.featureCard}>
-                <View style={styles.featureIconContainer}>
-                  <Heart size={24} color={Colors.primary} fill={Colors.primary} />
+                <View style={[styles.featureIconContainer, { backgroundColor: Colors.primary + "20" }]}>
+                  <Heart size={26} color={Colors.primary} fill={Colors.primary} strokeWidth={2.5} />
                 </View>
                 <Text style={styles.featureTitle}>Verified</Text>
                 <Text style={styles.featureDescription}>
-                  All users are face-verified for safety
+                  Face-verified for safety
                 </Text>
               </View>
             </View>
@@ -382,19 +379,19 @@ export default function HomeScreen() {
               activeOpacity={0.9}
             >
               <LinearGradient
-                colors={Colors.gradientDark as [string, string, ...string[]]}
+                colors={Colors.gradientPremium as [string, string, ...string[]]}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+                end={{ x: 1, y: 0 }}
                 style={styles.premiumGradient}
               >
                 <View style={styles.premiumContent}>
                   <View style={styles.premiumIcon}>
-                    <Sparkles size={28} color={Colors.accent} />
+                    <Zap size={32} color={Colors.white} fill={Colors.white} strokeWidth={2} />
                   </View>
                   <View style={styles.premiumTextContainer}>
-                    <Text style={styles.premiumTitle}>Upgrade to Premium</Text>
+                    <Text style={styles.premiumTitle}>Unlock Premium</Text>
                     <Text style={styles.premiumSubtitle}>
-                      Unlimited calls • Priority matching • Ad-free
+                      Unlimited flares • Priority matches • No ads
                     </Text>
                   </View>
                   <View style={styles.premiumArrow}>
@@ -424,13 +421,16 @@ export default function HomeScreen() {
               },
             ]}
           >
-            <View style={styles.modalIconContainer}>
-              <Sparkles size={48} color={Colors.primary} />
-            </View>
+            <LinearGradient
+              colors={Colors.gradientPremium as [string, string, ...string[]]}
+              style={styles.modalIconContainer}
+            >
+              <Sparkles size={56} color={Colors.white} strokeWidth={2} />
+            </LinearGradient>
 
-            <Text style={styles.modalTitle}>Out of Free Calls</Text>
+            <Text style={styles.modalTitle}>Out of Flares</Text>
             <Text style={styles.modalDescription}>
-              You&apos;ve used all 5 free calls! Upgrade to Premium for unlimited connections.
+              You&apos;ve used all 5 free flares! Upgrade to Premium for unlimited connections and premium features.
             </Text>
 
             <View style={styles.modalFeatures}>
@@ -505,57 +505,53 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 28,
+    marginBottom: 32,
   },
   greeting: {
     fontSize: 16,
     fontWeight: "500" as const,
     color: Colors.textSecondary,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   appName: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: "800" as const,
     color: Colors.text,
-    letterSpacing: -0.5,
+    letterSpacing: -1.5,
   },
   callsCounter: {
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  callsGradient: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    backgroundColor: Colors.surface,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-    shadowColor: Colors.shadowMedium,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 3,
-  },
-  callsIconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.primaryLight + "20",
-    alignItems: "center",
-    justifyContent: "center",
+    gap: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
   },
   callsLabel: {
     fontSize: 12,
     fontWeight: "600" as const,
-    color: Colors.textSecondary,
+    color: Colors.white,
+    opacity: 0.9,
   },
   callsValue: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "800" as const,
-    color: Colors.text,
+    color: Colors.white,
+    letterSpacing: -0.5,
   },
   modeSelector: {
-    marginBottom: 28,
+    marginBottom: 32,
   },
   modeSelectorTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "700" as const,
     color: Colors.text,
     marginBottom: 16,
@@ -567,32 +563,27 @@ const styles = StyleSheet.create({
   modeButton: {
     flex: 1,
     backgroundColor: Colors.surface,
-    borderRadius: 16,
-    paddingVertical: 16,
+    borderRadius: 18,
+    paddingVertical: 18,
     alignItems: "center",
-    gap: 8,
-    borderWidth: 2,
-    borderColor: "transparent",
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   modeButtonActive: {
     backgroundColor: Colors.primary,
-    borderColor: Colors.primaryDark,
-    shadowColor: Colors.primaryDark,
-    shadowOffset: { width: 0, height: 4 },
+    borderColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
-    elevation: 4,
+    elevation: 6,
   },
   modeIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.borderLight,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.backgroundElevated,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -608,73 +599,76 @@ const styles = StyleSheet.create({
     color: Colors.white,
   },
   heroSection: {
-    marginBottom: 32,
+    marginBottom: 36,
   },
   heroCard: {
-    borderRadius: 24,
+    borderRadius: 28,
     overflow: "hidden",
-    shadowColor: Colors.shadowDark,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.3,
     shadowRadius: 24,
-    elevation: 8,
+    elevation: 12,
   },
   heroGradient: {
     position: "relative" as const,
-    minHeight: 280,
+    minHeight: 320,
     justifyContent: "center",
     alignItems: "center",
-    padding: 32,
+    padding: 40,
   },
   heroContent: {
     alignItems: "center",
     zIndex: 2,
   },
   heroIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   heroTitle: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "800" as const,
     color: Colors.white,
-    marginBottom: 8,
+    marginBottom: 10,
     textAlign: "center",
-    letterSpacing: -0.5,
+    letterSpacing: -1,
   },
   heroSubtitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "500" as const,
     color: Colors.white,
     opacity: 0.9,
     textAlign: "center",
-    marginBottom: 24,
-    lineHeight: 24,
+    marginBottom: 28,
+    lineHeight: 26,
     paddingHorizontal: 20,
   },
   startButton: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 10,
     backgroundColor: Colors.white,
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 30,
+    paddingHorizontal: 36,
+    paddingVertical: 18,
+    borderRadius: 32,
     shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowRadius: 16,
+    elevation: 6,
   },
   startButtonText: {
     fontSize: 18,
     fontWeight: "700" as const,
-    color: Colors.text,
+    color: Colors.textDark,
+    letterSpacing: 0.3,
   },
   heroGlow: {
     position: "absolute" as const,
@@ -685,7 +679,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   chatsSection: {
-    marginBottom: 32,
+    marginBottom: 36,
   },
   chatsSectionHeader: {
     flexDirection: "row",
@@ -694,161 +688,143 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   chatsSectionTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700" as const,
     color: Colors.text,
   },
   chatsSectionAction: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "600" as const,
     color: Colors.primary,
   },
   chatsScrollContent: {
-    gap: 12,
+    gap: 16,
     paddingRight: 20,
   },
   chatCard: {
-    width: 200,
-    backgroundColor: Colors.surface,
-    borderRadius: 20,
-    padding: 16,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 1,
+    width: 220,
+    borderRadius: 24,
+    overflow: "hidden",
+    shadowColor: Colors.shadowDark,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
     shadowRadius: 12,
-    elevation: 3,
+    elevation: 6,
+  },
+  chatCardGradient: {
+    padding: 20,
+    minHeight: 160,
   },
   chatCardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 12,
-  },
-  chatCardIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  chatCardIconDate: {
-    backgroundColor: Colors.primaryLight + "20",
-  },
-  chatCardIconGroup: {
-    backgroundColor: Colors.accent + "20",
-  },
-  chatCardIconFriend: {
-    backgroundColor: Colors.secondaryDark + "20",
+    marginBottom: 14,
   },
   chatCardEmoji: {
-    fontSize: 24,
+    fontSize: 32,
   },
   chatCardBadge: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  chatCardBadgeGroup: {
-    backgroundColor: Colors.accent,
-  },
-  chatCardBadgeFriend: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.3)",
   },
   chatCardBadgeText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: "700" as const,
     color: Colors.white,
+    letterSpacing: 0.5,
   },
   chatCardName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "700" as const,
-    color: Colors.text,
+    color: Colors.white,
     marginBottom: 8,
   },
   chatCardMessage: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "500" as const,
-    color: Colors.textSecondary,
-    marginBottom: 8,
-    lineHeight: 18,
+    color: Colors.white,
+    opacity: 0.9,
+    marginBottom: 10,
+    lineHeight: 20,
   },
   chatCardTime: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "600" as const,
-    color: Colors.textTertiary,
+    color: Colors.white,
+    opacity: 0.8,
   },
   featuresSection: {
     marginBottom: 32,
   },
   featuresSectionTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700" as const,
     color: Colors.text,
     marginBottom: 16,
   },
   featuresGrid: {
     flexDirection: "row",
-    gap: 12,
+    gap: 14,
   },
   featureCard: {
     flex: 1,
     backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 20,
+    padding: 18,
     alignItems: "center",
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   featureIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: Colors.background,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 12,
+    marginBottom: 14,
   },
   featureTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "700" as const,
     color: Colors.text,
-    marginBottom: 4,
+    marginBottom: 6,
     textAlign: "center",
   },
   featureDescription: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "500" as const,
     color: Colors.textSecondary,
     textAlign: "center",
-    lineHeight: 16,
+    lineHeight: 17,
   },
   premiumCard: {
-    borderRadius: 20,
+    borderRadius: 24,
     overflow: "hidden",
     marginBottom: 20,
-    shadowColor: Colors.shadowDark,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 6,
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 8,
   },
   premiumGradient: {
-    padding: 20,
+    padding: 24,
   },
   premiumContent: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
+    gap: 18,
   },
   premiumIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "rgba(255, 230, 109, 0.15)",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -856,27 +832,28 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   premiumTitle: {
-    fontSize: 18,
-    fontWeight: "700" as const,
+    fontSize: 20,
+    fontWeight: "800" as const,
     color: Colors.white,
-    marginBottom: 4,
+    marginBottom: 6,
+    letterSpacing: -0.5,
   },
   premiumSubtitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "500" as const,
     color: Colors.white,
-    opacity: 0.8,
+    opacity: 0.9,
   },
   premiumArrow: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
     alignItems: "center",
     justifyContent: "center",
   },
   premiumArrowText: {
-    fontSize: 18,
+    fontSize: 20,
     color: Colors.white,
     fontWeight: "700" as const,
   },
@@ -892,97 +869,102 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: Colors.surface,
-    borderRadius: 28,
-    padding: 32,
+    borderRadius: 32,
+    padding: 36,
     width: "100%",
     maxWidth: 400,
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
     shadowColor: Colors.shadowDark,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.5,
-    shadowRadius: 32,
-    elevation: 12,
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.6,
+    shadowRadius: 40,
+    elevation: 16,
   },
   modalIconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.primaryLight + "20",
+    width: 96,
+    height: 96,
+    borderRadius: 48,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 24,
   },
   modalTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "800" as const,
     color: Colors.text,
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 14,
+    letterSpacing: -0.5,
   },
   modalDescription: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "500" as const,
     color: Colors.textSecondary,
     textAlign: "center",
-    marginBottom: 24,
-    lineHeight: 22,
+    marginBottom: 28,
+    lineHeight: 24,
   },
   modalFeatures: {
     width: "100%",
-    marginBottom: 24,
-    gap: 12,
+    marginBottom: 28,
+    gap: 14,
   },
   modalFeature: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Colors.background,
-    borderRadius: 12,
-    padding: 12,
-    gap: 12,
+    backgroundColor: Colors.backgroundElevated,
+    borderRadius: 16,
+    padding: 16,
+    gap: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   modalFeatureIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: Colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
   modalFeatureIconText: {
-    fontSize: 18,
+    fontSize: 20,
   },
   modalFeatureText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "600" as const,
     color: Colors.text,
     flex: 1,
   },
   modalButton: {
     width: "100%",
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: "hidden",
-    marginBottom: 12,
-    shadowColor: Colors.primaryDark,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 4,
+    marginBottom: 14,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
   },
   modalButtonGradient: {
-    paddingVertical: 16,
+    paddingVertical: 18,
     alignItems: "center",
     justifyContent: "center",
   },
   modalButtonText: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: "700" as const,
     color: Colors.white,
+    letterSpacing: 0.3,
   },
   modalCancelButton: {
-    paddingVertical: 12,
+    paddingVertical: 14,
   },
   modalCancelText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "600" as const,
     color: Colors.textSecondary,
   },
