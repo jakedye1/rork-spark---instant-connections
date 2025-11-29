@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { Sparkles, Video, Users, Heart, Shield, Zap } from "lucide-react-native";
+import { Video, Shield, Zap, Users, MapPin, Heart, Check, Sparkles } from "lucide-react-native";
 import React, { useState, useRef } from "react";
 import {
   StyleSheet,
@@ -11,21 +11,20 @@ import {
   Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BlurView } from "expo-blur";
 import Colors from "@/constants/colors";
 import { useAuth } from "@/contexts/AuthContext";
 
-type OnboardingStep = "welcome" | "features" | "setup";
+type OnboardingStep = "welcome" | "how-it-works" | "privacy";
 
 export default function OnboardingScreen() {
   const router = useRouter();
   const { markOnboardingComplete } = useAuth();
   const [step, setStep] = useState<OnboardingStep>("welcome");
   const scrollViewRef = useRef<ScrollView>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState<boolean>(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
-  const sparkleAnim1 = useRef(new Animated.Value(0)).current;
-  const sparkleAnim2 = useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
     fadeAnim.setValue(0);
@@ -42,282 +41,228 @@ export default function OnboardingScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(sparkleAnim1, {
-          toValue: 1,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(sparkleAnim1, {
-          toValue: 0,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(sparkleAnim2, {
-          toValue: 1,
-          duration: 2500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(sparkleAnim2, {
-          toValue: 0,
-          duration: 2500,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, [step, fadeAnim, slideAnim, sparkleAnim1, sparkleAnim2]);
+  }, [step]);
 
   const handleNext = async () => {
     if (step === "welcome") {
-      setStep("features");
-    } else if (step === "features") {
-      setStep("setup");
+      setStep("how-it-works");
+    } else if (step === "how-it-works") {
+      setStep("privacy");
     } else {
+      if (!acceptedTerms || !acceptedPrivacy) {
+        return;
+      }
       await markOnboardingComplete();
       router.replace("/profile-setup");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        colors={[Colors.background, Colors.backgroundLight, Colors.background]}
-        style={styles.gradient}
-      >
-        <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-          <View style={styles.header}>
-            <View style={styles.dotsContainer}>
-              <View style={[styles.dot, step === "welcome" && styles.dotActive]} />
-              <View style={[styles.dot, step === "features" && styles.dotActive]} />
-              <View style={[styles.dot, step === "setup" && styles.dotActive]} />
-            </View>
+    <LinearGradient
+      colors={Colors.gradientDark as [string, string, ...string[]]}
+      style={styles.container}
+    >
+      <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+        <View style={styles.header}>
+          <View style={styles.dotsContainer}>
+            <View style={[styles.dot, step === "welcome" && styles.dotActive]} />
+            <View style={[styles.dot, step === "how-it-works" && styles.dotActive]} />
+            <View style={[styles.dot, step === "privacy" && styles.dotActive]} />
           </View>
+        </View>
 
-          <ScrollView
-            ref={scrollViewRef}
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            keyboardDismissMode="on-drag"
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardDismissMode="on-drag"
+        >
+          <Animated.View 
+            style={[
+              styles.stepContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
+              },
+            ]}
           >
-            <Animated.View 
-              style={[
-                styles.stepContainer,
-                {
-                  opacity: fadeAnim,
-                  transform: [{ translateY: slideAnim }],
-                },
-              ]}
-            >
-              {step === "welcome" && (
-                <View style={styles.content}>
-                  <View style={styles.heroContainer}>
-                    <LinearGradient
-                      colors={[Colors.babyBlue, Colors.aquaGlow]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={styles.heroGradientOuter}
-                    >
-                      <BlurView intensity={30} style={styles.heroBlur}>
-                        <Sparkles size={80} color={Colors.white} strokeWidth={2} />
-                      </BlurView>
-                    </LinearGradient>
-                    
-                    <Animated.View
-                      style={[
-                        styles.sparkle1,
-                        {
-                          opacity: sparkleAnim1,
-                          transform: [
-                            {
-                              translateY: sparkleAnim1.interpolate({
-                                inputRange: [0, 1],
-                                outputRange: [0, -20],
-                              }),
-                            },
-                          ],
-                        },
-                      ]}
-                    >
-                      <Sparkles size={24} color={Colors.pastelYellow} />
-                    </Animated.View>
-                    
-                    <Animated.View
-                      style={[
-                        styles.sparkle2,
-                        {
-                          opacity: sparkleAnim2,
-                          transform: [
-                            {
-                              translateY: sparkleAnim2.interpolate({
-                                inputRange: [0, 1],
-                                outputRange: [0, -30],
-                              }),
-                            },
-                          ],
-                        },
-                      ]}
-                    >
-                      <Sparkles size={20} color={Colors.aquaGlow} />
-                    </Animated.View>
-                  </View>
-
-                  <Text style={styles.title}>Where Real People{"\n"}Connect Fast</Text>
-                  <Text style={styles.subtitle}>
-                    Swipe. Match. Go Live.{"\n"}Make sparks happen.
-                  </Text>
-                </View>
-              )}
-
-              {step === "features" && (
-                <View style={styles.content}>
-                  <Text style={styles.title}>What Spark Is</Text>
-
-                  <View style={styles.featuresGrid}>
-                    <View style={styles.glassCard}>
-                      <BlurView intensity={40} tint="dark" style={styles.glassCardBlur}>
-                        <LinearGradient
-                          colors={[Colors.glass, Colors.glassDark]}
-                          style={styles.glassCardGradient}
-                        >
-                          <View style={styles.iconCircle}>
-                            <LinearGradient
-                              colors={[Colors.babyBlue, Colors.primaryDark]}
-                              style={styles.iconGradient}
-                            >
-                              <Video size={32} color={Colors.white} strokeWidth={2.5} />
-                            </LinearGradient>
-                          </View>
-                          <Text style={styles.featureTitle}>Live Video{"\n"}Matching</Text>
-                        </LinearGradient>
-                      </BlurView>
-                    </View>
-
-                    <View style={styles.glassCard}>
-                      <BlurView intensity={40} tint="dark" style={styles.glassCardBlur}>
-                        <LinearGradient
-                          colors={[Colors.glass, Colors.glassDark]}
-                          style={styles.glassCardGradient}
-                        >
-                          <View style={styles.iconCircle}>
-                            <LinearGradient
-                              colors={[Colors.pastelYellow, Colors.secondaryDark]}
-                              style={styles.iconGradient}
-                            >
-                              <Zap size={32} color={Colors.white} strokeWidth={2.5} />
-                            </LinearGradient>
-                          </View>
-                          <Text style={styles.featureTitle}>Instant{"\n"}Connections</Text>
-                        </LinearGradient>
-                      </BlurView>
-                    </View>
-
-                    <View style={styles.glassCard}>
-                      <BlurView intensity={40} tint="dark" style={styles.glassCardBlur}>
-                        <LinearGradient
-                          colors={[Colors.glass, Colors.glassDark]}
-                          style={styles.glassCardGradient}
-                        >
-                          <View style={styles.iconCircle}>
-                            <LinearGradient
-                              colors={[Colors.aquaGlow, Colors.accentDark]}
-                              style={styles.iconGradient}
-                            >
-                              <Users size={32} color={Colors.white} strokeWidth={2.5} />
-                            </LinearGradient>
-                          </View>
-                          <Text style={styles.featureTitle}>Group Match{"\n"}Mode</Text>
-                        </LinearGradient>
-                      </BlurView>
-                    </View>
-                  </View>
-
-                  <Text style={styles.bottomText}>Meet real humans in real time.</Text>
-                </View>
-              )}
-
-              {step === "setup" && (
-                <View style={styles.content}>
+            {step === "welcome" && (
+              <View style={styles.content}>
+                <View style={styles.heroIconContainer}>
                   <LinearGradient
-                    colors={[Colors.babyBlue, Colors.aquaGlow]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.setupIcon}
+                    colors={Colors.gradientHero as [string, string, ...string[]]}
+                    style={styles.heroIconGradient}
                   >
-                    <BlurView intensity={30} style={styles.setupBlur}>
-                      <Shield size={64} color={Colors.white} strokeWidth={2} />
-                    </BlurView>
+                    <Sparkles size={64} color={Colors.white} strokeWidth={2} />
                   </LinearGradient>
+                </View>
 
-                  <Text style={styles.title}>Build Your Vibe</Text>
-                  <Text style={styles.subtitle}>
-                    Set up your profile and start connecting with amazing people near you.
-                  </Text>
+                <Text style={styles.title}>Welcome to Spark</Text>
+                <Text style={styles.subtitle}>
+                  Real connections happen instantly. Skip the endless swiping and jump straight into live conversations.
+                </Text>
+              </View>
+            )}
 
-                  <View style={styles.setupFeatures}>
-                    <View style={styles.setupFeature}>
-                      <View style={styles.setupCheck}>
-                        <Heart size={16} color={Colors.babyBlue} fill={Colors.babyBlue} />
-                      </View>
-                      <Text style={styles.setupFeatureText}>Face ID Verified</Text>
+            {step === "how-it-works" && (
+              <View style={styles.content}>
+                <Text style={styles.title}>How It Works</Text>
+                <Text style={styles.subtitle}>Connect in 3 simple steps</Text>
+
+                <View style={styles.featuresContainer}>
+                  <View style={styles.featureCard}>
+                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.primary + "20" }]}>
+                      <Zap size={28} color={Colors.primary} strokeWidth={2.5} />
                     </View>
-                    <View style={styles.setupFeature}>
-                      <View style={styles.setupCheck}>
-                        <Shield size={16} color={Colors.aquaGlow} />
-                      </View>
-                      <Text style={styles.setupFeatureText}>100% Safe & Secure</Text>
+                    <Text style={styles.featureTitle}>1. AI Matches You</Text>
+                    <Text style={styles.featureDescription}>
+                      Our smart AI finds people nearby who share your interests and preferences in seconds.
+                    </Text>
+                  </View>
+
+                  <View style={styles.featureCard}>
+                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.secondary + "20" }]}>
+                      <Video size={28} color={Colors.secondary} strokeWidth={2.5} />
                     </View>
-                    <View style={styles.setupFeature}>
-                      <View style={styles.setupCheck}>
-                        <Sparkles size={16} color={Colors.pastelYellow} />
-                      </View>
-                      <Text style={styles.setupFeatureText}>AI Powered</Text>
+                    <Text style={styles.featureTitle}>2. Live Video Chat</Text>
+                    <Text style={styles.featureDescription}>
+                      Jump into The Flare for instant 1-on-1 video calls. 5 seconds to decide, up to 1 minute to connect.
+                    </Text>
+                  </View>
+
+                  <View style={styles.featureCard}>
+                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.accent + "20" }]}>
+                      <Heart size={28} color={Colors.accent} strokeWidth={2.5} />
                     </View>
+                    <Text style={styles.featureTitle}>3. Make Real Plans</Text>
+                    <Text style={styles.featureDescription}>
+                      Both say yes? Share contacts and plan your first date or hangout instantly.
+                    </Text>
                   </View>
                 </View>
-              )}
-            </Animated.View>
-          </ScrollView>
+              </View>
+            )}
 
-          <View style={styles.footer}>
-            <TouchableOpacity
-              style={styles.nextButton}
-              onPress={handleNext}
-              activeOpacity={0.9}
+            {step === "privacy" && (
+              <View style={styles.content}>
+                <Text style={styles.title}>Your Safety First</Text>
+                <Text style={styles.subtitle}>We take your privacy seriously</Text>
+
+                <View style={styles.featuresContainer}>
+                  <View style={styles.featureCard}>
+                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.success + "20" }]}>
+                      <Shield size={28} color={Colors.success} strokeWidth={2.5} />
+                    </View>
+                    <Text style={styles.featureTitle}>Face ID Verification</Text>
+                    <Text style={styles.featureDescription}>
+                      All users must verify their identity through facial recognition. Only real people, no bots.
+                    </Text>
+                  </View>
+
+                  <View style={styles.featureCard}>
+                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.info + "20" }]}>
+                      <MapPin size={28} color={Colors.info} strokeWidth={2.5} />
+                    </View>
+                    <Text style={styles.featureTitle}>Location Control</Text>
+                    <Text style={styles.featureDescription}>
+                      You control your search radius. Your exact location is never shared with other users.
+                    </Text>
+                  </View>
+
+                  <View style={styles.featureCard}>
+                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.warning + "20" }]}>
+                      <Users size={28} color={Colors.warning} strokeWidth={2.5} />
+                    </View>
+                    <Text style={styles.featureTitle}>AI Moderation</Text>
+                    <Text style={styles.featureDescription}>
+                      Advanced AI monitors video chats for inappropriate behavior to keep everyone safe.
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.agreementContainer}>
+                  <TouchableOpacity
+                    style={styles.checkboxRow}
+                    onPress={() => setAcceptedTerms(!acceptedTerms)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={[styles.checkbox, acceptedTerms && styles.checkboxChecked]}>
+                      {acceptedTerms && <Check size={16} color={Colors.white} strokeWidth={3} />}
+                    </View>
+                    <Text style={styles.agreementText}>
+                      I agree to the{" "}
+                      <Text
+                        style={styles.linkText}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          router.push("/terms");
+                        }}
+                      >
+                        Terms of Service
+                      </Text>
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.checkboxRow}
+                    onPress={() => setAcceptedPrivacy(!acceptedPrivacy)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={[styles.checkbox, acceptedPrivacy && styles.checkboxChecked]}>
+                      {acceptedPrivacy && <Check size={16} color={Colors.white} strokeWidth={3} />}
+                    </View>
+                    <Text style={styles.agreementText}>
+                      I agree to the{" "}
+                      <Text
+                        style={styles.linkText}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          router.push("/privacy-policy");
+                        }}
+                      >
+                        Privacy Policy
+                      </Text>
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </Animated.View>
+        </ScrollView>
+
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={[
+              styles.nextButton,
+              step === "privacy" && (!acceptedTerms || !acceptedPrivacy) && styles.nextButtonDisabled,
+            ]}
+            onPress={handleNext}
+            disabled={step === "privacy" && (!acceptedTerms || !acceptedPrivacy)}
+          >
+            <LinearGradient
+              colors={
+                step === "privacy" && (!acceptedTerms || !acceptedPrivacy)
+                  ? [Colors.surface, Colors.surface]
+                  : (Colors.gradient1 as [string, string, ...string[]])
+              }
+              style={styles.nextButtonGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
             >
-              <BlurView intensity={60} tint="dark" style={styles.buttonBlur}>
-                <LinearGradient
-                  colors={[Colors.babyBlue, Colors.aquaGlow]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.nextButtonGradient}
-                >
-                  <Text style={styles.nextButtonText}>
-                    {step === "setup" ? "Get Started" : "Next"}
-                  </Text>
-                </LinearGradient>
-              </BlurView>
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-      </LinearGradient>
-    </View>
+              <Text style={styles.nextButtonText}>
+                {step === "privacy" ? "Get Started" : "Next"}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  gradient: {
     flex: 1,
   },
   safeArea: {
@@ -338,213 +283,155 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.glass,
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
+    backgroundColor: Colors.textTertiary,
   },
   dotActive: {
     width: 32,
-    backgroundColor: Colors.babyBlue,
-    borderColor: Colors.babyBlue,
-    shadowColor: Colors.shadowNeon,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: Colors.primary,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: 24,
-    paddingVertical: 20,
   },
   stepContainer: {
     alignItems: "center",
+    paddingVertical: 20,
   },
   content: {
     alignItems: "center",
     width: "100%",
-    gap: 32,
   },
-  heroContainer: {
-    position: "relative" as const,
-    width: 180,
-    height: 180,
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 20,
+  heroIconContainer: {
+    marginBottom: 40,
   },
-  heroGradientOuter: {
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    padding: 4,
-    shadowColor: Colors.shadowNeon,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 40,
-    elevation: 20,
-  },
-  heroBlur: {
-    flex: 1,
-    borderRadius: 86,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  sparkle1: {
-    position: "absolute" as const,
-    top: 10,
-    right: 20,
-  },
-  sparkle2: {
-    position: "absolute" as const,
-    bottom: 20,
-    left: 10,
-  },
-  title: {
-    fontSize: 40,
-    fontWeight: "900" as const,
-    color: Colors.white,
-    textAlign: "center",
-    letterSpacing: -1.5,
-    lineHeight: 48,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: "500" as const,
-    color: Colors.textSecondary,
-    textAlign: "center",
-    lineHeight: 28,
-    paddingHorizontal: 20,
-  },
-  featuresGrid: {
-    width: "100%",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 16,
-    justifyContent: "center",
-  },
-  glassCard: {
-    width: "45%",
-    aspectRatio: 1,
-    borderRadius: 24,
-    overflow: "hidden",
-  },
-  glassCardBlur: {
-    flex: 1,
-  },
-  glassCardGradient: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
-    borderRadius: 24,
-  },
-  iconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    overflow: "hidden",
-  },
-  iconGradient: {
-    width: "100%",
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  featureTitle: {
-    fontSize: 16,
-    fontWeight: "700" as const,
-    color: Colors.white,
-    textAlign: "center",
-    lineHeight: 22,
-  },
-  bottomText: {
-    fontSize: 18,
-    fontWeight: "600" as const,
-    color: Colors.textSecondary,
-    textAlign: "center",
-    marginTop: 8,
-  },
-  setupIcon: {
+  heroIconGradient: {
     width: 140,
     height: 140,
     borderRadius: 70,
-    padding: 4,
-    shadowColor: Colors.shadowAqua,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 30,
-    elevation: 15,
-  },
-  setupBlur: {
-    flex: 1,
-    borderRadius: 66,
     alignItems: "center",
     justifyContent: "center",
-    overflow: "hidden",
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 24,
+    elevation: 12,
   },
-  setupFeatures: {
-    width: "100%",
-    gap: 16,
-    marginTop: 16,
-  },
-  setupFeature: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    backgroundColor: Colors.glass,
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
-    borderRadius: 20,
-    padding: 20,
-  },
-  setupCheck: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.glassLight,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  setupFeatureText: {
-    fontSize: 17,
-    fontWeight: "600" as const,
+  title: {
+    fontSize: 36,
+    fontWeight: "800" as const,
     color: Colors.text,
-    flex: 1,
+    marginBottom: 16,
+    textAlign: "center",
+    letterSpacing: -1,
+  },
+  subtitle: {
+    fontSize: 17,
+    fontWeight: "500" as const,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    marginBottom: 40,
+    paddingHorizontal: 20,
+    lineHeight: 26,
+  },
+  featuresContainer: {
+    width: "100%",
+    gap: 20,
+  },
+  featureCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    padding: 24,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  featureIconContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  featureTitle: {
+    fontSize: 20,
+    fontWeight: "700" as const,
+    color: Colors.text,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  featureDescription: {
+    fontSize: 15,
+    fontWeight: "500" as const,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    lineHeight: 22,
   },
   footer: {
     paddingHorizontal: 24,
     paddingVertical: 20,
   },
   nextButton: {
-    height: 64,
-    borderRadius: 32,
+    height: 58,
+    borderRadius: 29,
     overflow: "hidden",
-    shadowColor: Colors.shadowNeon,
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
   },
-  buttonBlur: {
-    flex: 1,
+  nextButtonDisabled: {
+    opacity: 0.5,
+    shadowOpacity: 0,
   },
   nextButtonGradient: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: Colors.glassLight,
   },
   nextButtonText: {
-    fontSize: 20,
-    fontWeight: "800" as const,
+    fontSize: 18,
+    fontWeight: "700" as const,
     color: Colors.white,
     letterSpacing: 0.5,
+  },
+  agreementContainer: {
+    marginTop: 32,
+    gap: 16,
+    width: "100%",
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  agreementText: {
+    fontSize: 15,
+    fontWeight: "500" as const,
+    color: Colors.textSecondary,
+    flex: 1,
+    lineHeight: 22,
+  },
+  linkText: {
+    color: Colors.primary,
+    fontWeight: "700" as const,
+    textDecorationLine: "underline" as const,
   },
 });
