@@ -1,163 +1,140 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "expo-router";
-import { View, Text, StyleSheet, Animated, Dimensions } from "react-native";
-import { useEffect, useRef, useState } from "react";
+import { Redirect } from "expo-router";
+import { View, Text, StyleSheet, Animated } from "react-native";
+import { useEffect, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 import Colors from "@/constants/colors";
-import { GlassCard } from "@/components/GlassCard";
 
-const { height } = Dimensions.get('window');
-
-export default function Splash() {
+export default function Index() {
   const { user, isLoading } = useAuth();
-  const router = useRouter();
-  const [isReady, setIsReady] = useState(false);
-  
-  // Animations
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
-  const shimmerAnim = useRef(new Animated.Value(-1)).current;
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Sequence: Fade In -> Glow -> Shimmer -> Wait -> Slide Up
-    Animated.sequence([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
+    console.log('Index screen - user:', user ? 'logged in' : 'not logged in', 'isLoading:', isLoading);
+    
+    if (isLoading) {
       Animated.parallel([
-        Animated.timing(glowAnim, {
+        Animated.spring(scaleAnim, {
           toValue: 1,
-          duration: 1000,
+          tension: 20,
+          friction: 7,
           useNativeDriver: true,
         }),
-        Animated.timing(shimmerAnim, {
+        Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 1500,
+          duration: 600,
           useNativeDriver: true,
         }),
-      ]),
-      Animated.delay(500),
-    ]).start(() => {
-      // After animation completes, we are ready to navigate
-      // but we wait for auth loading to finish too
-      setIsReady(true);
-    });
-  }, [fadeAnim, glowAnim, shimmerAnim]);
+      ]).start();
 
-  useEffect(() => {
-    if (isReady && !isLoading) {
-      // Transition out
-      Animated.timing(slideAnim, {
-        toValue: -height,
-        duration: 500,
-        useNativeDriver: true,
-      }).start(() => {
-        if (user) {
-          router.replace("/(tabs)/home");
-        } else {
-          router.replace("/onboarding");
-        }
-      });
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(glowAnim, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(glowAnim, {
+            toValue: 0,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
     }
-  }, [isReady, isLoading, user, slideAnim, router]);
+  }, [user, isLoading, scaleAnim, glowAnim, fadeAnim]);
 
-  return (
-    <Animated.View style={[styles.container, { transform: [{ translateY: slideAnim }] }]}>
-      <LinearGradient
-        colors={[Colors.background, Colors.background]}
-        style={styles.gradient}
-      >
-        <Animated.View style={{ opacity: fadeAnim, alignItems: 'center' }}>
-          {/* Logo Container */}
-          <View style={styles.logoContainer}>
-            {/* Outer Aura Glow */}
-            <Animated.View
-              style={[
-                styles.aura,
-                {
-                  opacity: glowAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, 0.5],
-                  }),
-                  transform: [
-                    {
-                      scale: glowAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0.8, 1.2],
-                      }),
-                    },
-                  ],
-                },
-              ]}
-            />
-
-            {/* Flame Logo */}
-            <GlassCard 
-              intensity={40} 
-              variant="default"
-              style={styles.flameCard}
-            >
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <LinearGradient
+          colors={[Colors.background, Colors.backgroundLight, Colors.background]}
+          style={styles.gradient}
+        >
+          <Animated.View 
+            style={[
+              styles.content,
+              {
+                opacity: fadeAnim,
+                transform: [{ scale: scaleAnim }],
+              },
+            ]}
+          >
+            <View style={styles.logoContainer}>
               <LinearGradient
-                colors={Colors.gradientPrimary as [string, string, ...string[]]}
+                colors={[Colors.babyBlue, Colors.aquaGlow]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={styles.flameGradient}
+                style={styles.flameOuter}
               >
-                 <Text style={styles.flameIcon}>🔥</Text>
-                 
-                 {/* Shimmer Effect */}
-                 <Animated.View 
-                    style={[
-                      styles.shimmer,
-                      {
-                        transform: [
-                          {
-                            translateX: shimmerAnim.interpolate({
-                              inputRange: [-1, 1],
-                              outputRange: [-100, 100],
-                            })
-                          }
-                        ]
-                      }
-                    ]}
-                 >
-                   <LinearGradient
-                      colors={["transparent", "rgba(255,255,255,0.4)", "transparent"]}
-                      start={{ x: 0, y: 0.5 }}
-                      end={{ x: 1, y: 0.5 }}
-                      style={{ flex: 1 }}
-                   />
-                 </Animated.View>
+                <BlurView intensity={20} style={styles.flameBlur}>
+                  <LinearGradient
+                    colors={[Colors.babyBlue, Colors.pastelYellow]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                    style={styles.flameInner}
+                  >
+                    <Text style={styles.flameEmoji}>🔥</Text>
+                  </LinearGradient>
+                </BlurView>
               </LinearGradient>
-            </GlassCard>
-          </View>
 
-          {/* Text in Thin Glass Card */}
-          <View style={styles.textWrapper}>
-            <GlassCard intensity={20} style={styles.textCard}>
-              <Text style={styles.title}>SPARK</Text>
-            </GlassCard>
-          </View>
+              <Animated.View
+                style={[
+                  styles.glowRing,
+                  {
+                    opacity: glowAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.3, 0.8],
+                    }),
+                    transform: [
+                      {
+                        scale: glowAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [1, 1.15],
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              />
+            </View>
 
-          {/* Loading Indicator */}
-          <View style={styles.loaderContainer}>
-            <Animated.View
-              style={[
-                styles.loaderBar,
-                {
-                  opacity: glowAnim,
-                  transform: [{ scaleX: glowAnim }],
-                },
-              ]}
-            />
-          </View>
-        </Animated.View>
-      </LinearGradient>
-    </Animated.View>
-  );
+            <View style={styles.textContainer}>
+              <LinearGradient
+                colors={[Colors.white, Colors.textSecondary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.textGradient}
+              >
+                <Text style={styles.sparkText}>SPARK</Text>
+              </LinearGradient>
+              
+              <View style={styles.loadingBar}>
+                <Animated.View
+                  style={[
+                    styles.loadingBarInner,
+                    {
+                      opacity: glowAnim,
+                    },
+                  ]}
+                />
+              </View>
+            </View>
+          </Animated.View>
+        </LinearGradient>
+      </View>
+    );
+  }
+
+  if (user) {
+    return <Redirect href="/(tabs)/home" />;
+  }
+
+  return <Redirect href="/auth" />;
 }
 
 const styles = StyleSheet.create({
@@ -167,80 +144,88 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  content: {
+    alignItems: "center",
+    gap: 48,
   },
   logoContainer: {
-    position: "relative",
+    position: "relative" as const,
+    width: 160,
+    height: 160,
     alignItems: "center",
     justifyContent: "center",
-    width: 200,
-    height: 200,
   },
-  aura: {
-    position: "absolute",
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    backgroundColor: Colors.accent, // Aqua glow
-    opacity: 0.3,
-    shadowColor: Colors.accent,
+  flameOuter: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    padding: 4,
+    shadowColor: Colors.shadowNeon,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.8,
     shadowRadius: 40,
     elevation: 20,
   },
-  flameCard: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  flameGradient: {
-    width: "100%",
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  flameIcon: {
-    fontSize: 64,
-  },
-  shimmer: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    width: 50,
-    transform: [{ skewX: "-20deg" }],
-  },
-  textWrapper: {
-    marginTop: 40,
-  },
-  textCard: {
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.03)",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: Colors.white,
-    letterSpacing: 6, // Tracking increased
-  },
-  loaderContainer: {
-    marginTop: 40,
-    height: 2,
-    width: 150,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderRadius: 1,
+  flameBlur: {
+    flex: 1,
+    borderRadius: 76,
     overflow: "hidden",
   },
-  loaderBar: {
-    height: "100%",
+  flameInner: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 76,
+  },
+  flameEmoji: {
+    fontSize: 72,
+  },
+  glowRing: {
+    position: "absolute" as const,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    borderWidth: 2,
+    borderColor: Colors.aquaGlow,
+    shadowColor: Colors.shadowAqua,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 30,
+    elevation: 10,
+  },
+  textContainer: {
+    alignItems: "center",
+    gap: 20,
+  },
+  textGradient: {
+    borderRadius: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+  },
+  sparkText: {
+    fontSize: 52,
+    fontWeight: "900" as const,
+    color: Colors.white,
+    letterSpacing: 8,
+    textShadowColor: Colors.shadowNeon,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 20,
+  },
+  loadingBar: {
+    width: 200,
+    height: 4,
+    backgroundColor: Colors.glass,
+    borderRadius: 2,
+    overflow: "hidden",
+  },
+  loadingBarInner: {
     width: "100%",
-    backgroundColor: Colors.accent, // Neon line
-    shadowColor: Colors.accent,
+    height: "100%",
+    backgroundColor: Colors.aquaGlow,
+    shadowColor: Colors.shadowAqua,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
     shadowRadius: 10,

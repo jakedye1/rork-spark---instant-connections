@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { Send, Search, ChevronLeft } from "lucide-react-native";
+import { MessageCircle, Send, Search } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -14,8 +14,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/colors";
-import { GlassCard } from "@/components/GlassCard";
-import { GlassInput } from "@/components/GlassInput";
 
 type Match = {
   id: string;
@@ -68,7 +66,7 @@ const MATCHES: Match[] = [
   },
 ];
 
-export default function MessagesScreen() {
+export default function WhatsThePlanScreen() {
   const insets = useSafeAreaInsets();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [messageText, setMessageText] = useState("");
@@ -123,6 +121,7 @@ export default function MessagesScreen() {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
+      console.log('Refreshed matches');
       setRefreshing(false);
     }, 1000);
   }, []);
@@ -143,32 +142,26 @@ export default function MessagesScreen() {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={0}
           >
-            {/* Chat Header */}
-            <View style={[styles.chatHeader, { paddingTop: insets.top + 8 }]}>
-               <GlassCard intensity={30} style={styles.headerGlass}>
-                  <View style={styles.headerRow}>
-                     <TouchableOpacity
-                        style={styles.backButton}
-                        onPress={() => setSelectedMatch(null)}
-                     >
-                        <ChevronLeft size={28} color={Colors.white} />
-                     </TouchableOpacity>
-                     
-                     <View style={styles.chatHeaderInfo}>
-                        <LinearGradient
-                           colors={Colors.gradientPrimary as [string, string, ...string[]]}
-                           style={styles.avatarGradient}
-                        >
-                           <Text style={styles.avatarEmoji}>{selectedMatch.avatar}</Text>
-                        </LinearGradient>
-                        
-                        <View style={styles.chatHeaderText}>
-                           <Text style={styles.chatHeaderName}>{selectedMatch.name}</Text>
-                           <Text style={styles.chatHeaderStatus}>Online</Text>
-                        </View>
-                     </View>
+            <View style={[styles.chatHeader, { paddingTop: insets.top + 16 }]}>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => setSelectedMatch(null)}
+              >
+                <Text style={styles.backButtonText}>←</Text>
+              </TouchableOpacity>
+              <View style={styles.chatHeaderInfo}>
+                <View style={styles.chatHeaderAvatarContainer}>
+                  <Text style={styles.chatHeaderAvatar}>{selectedMatch.avatar}</Text>
+                </View>
+                <View style={styles.chatHeaderText}>
+                  <Text style={styles.chatHeaderName}>{selectedMatch.name}</Text>
+                  <View style={styles.interestsRowSmall}>
+                    {selectedMatch.interests.slice(0, 2).map((interest, idx) => (
+                      <Text key={idx} style={styles.interestSmall}>{interest.split(" ")[0]}</Text>
+                    ))}
                   </View>
-               </GlassCard>
+                </View>
+              </View>
             </View>
 
             <ScrollView
@@ -181,53 +174,33 @@ export default function MessagesScreen() {
                 <View
                   key={message.id}
                   style={[
-                    styles.messageBubbleWrapper,
-                    message.sender === "me" ? styles.myMessageWrapper : styles.theirMessageWrapper,
+                    styles.messageBubble,
+                    message.sender === "me" ? styles.myMessage : styles.theirMessage,
                   ]}
                 >
-                   <GlassCard 
-                     intensity={message.sender === "me" ? 40 : 20} 
-                     style={[
-                       styles.messageBubble,
-                       message.sender === "me" ? styles.myMessage : styles.theirMessage
-                     ]}
-                     variant={message.sender === "me" ? "default" : "dark"}
-                   >
-                     <Text style={[styles.messageText, message.sender === "me" && styles.myMessageText]}>
-                       {message.text}
-                     </Text>
-                     <Text style={[styles.messageTime, message.sender === "me" && styles.myMessageTime]}>
-                       {message.timestamp}
-                     </Text>
-                   </GlassCard>
+                  <Text style={[styles.messageText, message.sender === "me" && styles.myMessageText]}>{message.text}</Text>
+                  <Text style={[styles.messageTime, message.sender === "me" && styles.myMessageTime]}>{message.timestamp}</Text>
                 </View>
               ))}
             </ScrollView>
 
             <View style={[styles.inputSection, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-              <GlassCard intensity={20} style={styles.inputGlass}>
-                 <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Type a message..."
-                      placeholderTextColor={Colors.textTertiary}
-                      value={messageText}
-                      onChangeText={setMessageText}
-                      multiline
-                    />
-                    <TouchableOpacity
-                      style={styles.sendButton}
-                      onPress={handleSendMessage}
-                    >
-                      <LinearGradient
-                        colors={Colors.gradientPrimary as [string, string, ...string[]]}
-                        style={styles.sendGradient}
-                      >
-                         <Send size={18} color={Colors.charcoal} />
-                      </LinearGradient>
-                    </TouchableOpacity>
-                 </View>
-              </GlassCard>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Type a message..."
+                  placeholderTextColor={Colors.textTertiary}
+                  value={messageText}
+                  onChangeText={setMessageText}
+                  multiline
+                />
+                <TouchableOpacity
+                  style={styles.sendButton}
+                  onPress={handleSendMessage}
+                >
+                  <Send size={20} color={Colors.white} />
+                </TouchableOpacity>
+              </View>
             </View>
           </KeyboardAvoidingView>
         </LinearGradient>
@@ -252,54 +225,82 @@ export default function MessagesScreen() {
         >
           <View style={styles.header}>
             <Text style={styles.title}>Messages</Text>
+            <Text style={styles.subtitle}>
+              Connect with your matches
+            </Text>
           </View>
 
           <View style={styles.searchContainer}>
-             <GlassInput
+            <View style={styles.searchWrapper}>
+              <Search size={20} color={Colors.textSecondary} />
+              <TextInput
+                style={styles.searchInput}
                 placeholder="Search conversations..."
+                placeholderTextColor={Colors.textTertiary}
                 value={searchText}
                 onChangeText={setSearchText}
-                icon={<Search size={20} color={Colors.textSecondary} />}
-             />
+              />
+            </View>
           </View>
 
           <View style={styles.matchesContainer}>
             {filteredMatches.map((match) => (
               <TouchableOpacity
                 key={match.id}
+                style={styles.matchCard}
                 onPress={() => setSelectedMatch(match)}
                 activeOpacity={0.8}
               >
-                <GlassCard intensity={20} style={styles.matchCard}>
-                   <View style={styles.matchCardContent}>
-                      <LinearGradient
-                         colors={[Colors.glassLight, Colors.glass]}
-                         style={styles.matchAvatarContainer}
-                      >
-                         <Text style={styles.matchAvatarEmoji}>{match.avatar}</Text>
-                      </LinearGradient>
-                      
-                      <View style={styles.matchInfo}>
-                         <View style={styles.matchHeader}>
-                            <Text style={styles.matchName}>{match.name}</Text>
-                            <Text style={styles.matchTimestamp}>{match.timestamp}</Text>
-                         </View>
-                         <Text style={styles.matchLastMessage} numberOfLines={1}>
-                            {match.lastMessage}
-                         </Text>
+                <LinearGradient
+                  colors={
+                    match.type === "date"
+                      ? Colors.gradient1 as [string, string, ...string[]]
+                      : match.type === "group"
+                      ? Colors.gradient3 as [string, string, ...string[]]
+                      : Colors.gradient2 as [string, string, ...string[]]
+                  }
+                  style={styles.matchAvatarGradient}
+                >
+                  <Text style={styles.matchAvatarEmoji}>{match.avatar}</Text>
+                </LinearGradient>
+                {match.unread > 0 && (
+                  <View style={styles.unreadBadge}>
+                    <Text style={styles.unreadText}>{match.unread}</Text>
+                  </View>
+                )}
+
+                <View style={styles.matchInfo}>
+                  <View style={styles.matchHeader}>
+                    <Text style={styles.matchName}>{match.name}</Text>
+                    <Text style={styles.matchTimestamp}>{match.timestamp}</Text>
+                  </View>
+                  <Text style={styles.matchLastMessage} numberOfLines={1}>
+                    {match.lastMessage}
+                  </Text>
+                  <View style={styles.interestsRow}>
+                    {match.interests.map((interest, idx) => (
+                      <View key={idx} style={styles.interestTag}>
+                        <Text style={styles.interestText}>{interest}</Text>
                       </View>
-                      
-                      {match.unread > 0 && (
-                         <View style={styles.unreadBadge}>
-                            <Text style={styles.unreadText}>{match.unread}</Text>
-                         </View>
-                      )}
-                   </View>
-                </GlassCard>
+                    ))}
+                  </View>
+                </View>
+
+                <MessageCircle size={24} color={Colors.textTertiary} />
               </TouchableOpacity>
             ))}
           </View>
-          
+
+          <View style={styles.infoBox}>
+            <Text style={styles.infoTitle}>💬 Conversation Tips</Text>
+            <Text style={styles.infoText}>
+              • Ask about their interests{"\n"}
+              • Suggest specific date ideas{"\n"}
+              • Be genuine and respectful{"\n"}
+              • Start conversations that lead to connections
+            </Text>
+          </View>
+
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </LinearGradient>
@@ -310,7 +311,6 @@ export default function MessagesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   scrollView: {
     flex: 1,
@@ -323,41 +323,84 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "900",
-    color: Colors.white,
+    fontSize: 36,
+    fontWeight: "800" as const,
+    color: Colors.text,
     marginBottom: 8,
+    letterSpacing: -1,
+  },
+  subtitle: {
+    fontSize: 17,
+    fontWeight: "500" as const,
+    color: Colors.textSecondary,
   },
   searchContainer: {
-    marginBottom: 8,
+    marginBottom: 24,
   },
-  matchesContainer: {
-    gap: 12,
-  },
-  matchCard: {
-    borderRadius: 24,
-  },
-  matchCardContent: {
+  searchWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
-    gap: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    height: 52,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    gap: 12,
   },
-  matchAvatarContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: Colors.text,
+    fontWeight: "500" as const,
+  },
+  matchesContainer: {
+    gap: 14,
+    marginBottom: 24,
+  },
+  matchCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    position: "relative" as const,
+  },
+  matchAvatarGradient: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
   },
   matchAvatarEmoji: {
-    fontSize: 24,
+    fontSize: 32,
+  },
+  unreadBadge: {
+    position: "absolute" as const,
+    top: 12,
+    left: 60,
+    backgroundColor: Colors.primary,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: Colors.surface,
+  },
+  unreadText: {
+    fontSize: 11,
+    fontWeight: "800" as const,
+    color: Colors.white,
+    letterSpacing: -0.5,
   },
   matchInfo: {
     flex: 1,
-    gap: 4,
+    gap: 6,
   },
   matchHeader: {
     flexDirection: "row",
@@ -365,58 +408,84 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   matchName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: Colors.white,
+    fontSize: 18,
+    fontWeight: "700" as const,
+    color: Colors.text,
   },
   matchTimestamp: {
-    fontSize: 12,
+    fontSize: 13,
+    fontWeight: "600" as const,
     color: Colors.textTertiary,
   },
   matchLastMessage: {
-    fontSize: 14,
+    fontSize: 15,
+    fontWeight: "500" as const,
     color: Colors.textSecondary,
   },
-  unreadBadge: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: Colors.babyBlue,
-    alignItems: "center",
-    justifyContent: "center",
+  interestsRow: {
+    flexDirection: "row",
+    gap: 6,
+    marginTop: 4,
+    flexWrap: "wrap",
   },
-  unreadText: {
-    fontSize: 10,
-    fontWeight: "bold",
-    color: Colors.charcoal,
+  interestTag: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    backgroundColor: Colors.backgroundElevated,
+    borderRadius: 10,
+  },
+  interestText: {
+    fontSize: 12,
+    fontWeight: "600" as const,
+    color: Colors.text,
+  },
+  infoBox: {
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  infoTitle: {
+    fontSize: 20,
+    fontWeight: "700" as const,
+    color: Colors.text,
+    marginBottom: 14,
+  },
+  infoText: {
+    fontSize: 15,
+    fontWeight: "500" as const,
+    color: Colors.textSecondary,
+    lineHeight: 24,
   },
   bottomSpacer: {
-    height: 80,
+    height: 20,
   },
-  // Chat Screen Styles
   chatContainer: {
     flex: 1,
   },
   chatHeader: {
+    backgroundColor: Colors.surface,
     paddingHorizontal: 16,
-    paddingBottom: 16,
-    zIndex: 10,
-  },
-  headerGlass: {
-    borderRadius: 24,
-    overflow: "hidden",
-  },
-  headerRow: {
+    paddingBottom: 14,
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    gap: 12,
+    gap: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: Colors.backgroundElevated,
     alignItems: "center",
     justifyContent: "center",
+  },
+  backButtonText: {
+    fontSize: 22,
+    color: Colors.text,
+    fontWeight: "600" as const,
   },
   chatHeaderInfo: {
     flex: 1,
@@ -424,102 +493,112 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
-  avatarGradient: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  chatHeaderAvatarContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarEmoji: {
-    fontSize: 20,
+  chatHeaderAvatar: {
+    fontSize: 24,
   },
   chatHeaderText: {
-    justifyContent: "center",
+    flex: 1,
   },
   chatHeaderName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: Colors.white,
+    fontSize: 18,
+    fontWeight: "700" as const,
+    color: Colors.text,
+    marginBottom: 2,
   },
-  chatHeaderStatus: {
-    fontSize: 12,
-    color: Colors.babyBlue,
+  interestsRowSmall: {
+    flexDirection: "row",
+    gap: 6,
+  },
+  interestSmall: {
+    fontSize: 14,
   },
   messagesContainer: {
     flex: 1,
   },
   messagesContent: {
     padding: 16,
-    paddingBottom: 24,
-    gap: 16,
-  },
-  messageBubbleWrapper: {
-    width: "100%",
-  },
-  myMessageWrapper: {
-    alignItems: "flex-end",
-  },
-  theirMessageWrapper: {
-    alignItems: "flex-start",
+    gap: 12,
   },
   messageBubble: {
-    maxWidth: "80%",
-    borderRadius: 20,
-    padding: 16,
+    maxWidth: "75%",
+    padding: 14,
+    borderRadius: 18,
+    marginBottom: 4,
   },
   myMessage: {
-    borderBottomRightRadius: 4,
-    borderColor: Colors.babyBlue,
+    alignSelf: "flex-end",
+    backgroundColor: Colors.primary,
   },
   theirMessage: {
-    borderBottomLeftRadius: 4,
+    alignSelf: "flex-start",
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   messageText: {
     fontSize: 16,
+    fontWeight: "500" as const,
+    color: Colors.text,
+    marginBottom: 6,
     lineHeight: 22,
-    color: Colors.textSecondary,
   },
   myMessageText: {
     color: Colors.white,
   },
   messageTime: {
-    fontSize: 10,
-    marginTop: 6,
+    fontSize: 12,
+    fontWeight: "600" as const,
     color: Colors.textTertiary,
-    alignSelf: "flex-end",
   },
   myMessageTime: {
-    color: "rgba(255,255,255,0.6)",
+    color: Colors.white,
+    opacity: 0.7,
   },
   inputSection: {
+    backgroundColor: Colors.surface,
     paddingHorizontal: 16,
-  },
-  inputGlass: {
-    borderRadius: 30,
-    overflow: "hidden",
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
   },
   inputContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    padding: 8,
-    paddingLeft: 20,
+    alignItems: "flex-end",
+    gap: 10,
+    marginBottom: 12,
   },
   input: {
     flex: 1,
-    color: Colors.white,
+    backgroundColor: Colors.backgroundElevated,
+    borderRadius: 22,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
     fontSize: 16,
+    fontWeight: "500" as const,
+    color: Colors.text,
     maxHeight: 100,
-    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   sendButton: {
-    marginLeft: 8,
-  },
-  sendGradient: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
 });

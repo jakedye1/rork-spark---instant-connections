@@ -12,9 +12,8 @@ import {
   FileText,
   Info,
   ChevronLeft,
-  MessageCircle,
 } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "expo-router";
 import {
@@ -27,14 +26,22 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { BlurView } from "expo-blur";
 import Colors from "@/constants/colors";
-import { GlassCard } from "@/components/GlassCard";
 
 export default function SettingsScreen() {
   const { user, updateSettings } = useAuth();
   const router = useRouter();
 
   const [locationEnabled, setLocationEnabled] = useState(user?.locationEnabled || false);
+
+  useEffect(() => {
+    console.log('Settings screen mounted');
+    console.log('Current user:', user);
+    return () => {
+      console.log('Settings screen unmounted');
+    };
+  }, [user]);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [matchNotifications, setMatchNotifications] = useState(true);
@@ -44,11 +51,13 @@ export default function SettingsScreen() {
   const [incognitoMode, setIncognitoMode] = useState(false);
 
   const handleLocationToggle = async (value: boolean) => {
+    console.log('Location toggle changed:', value);
     setLocationEnabled(value);
     try {
       await updateSettings({
         locationEnabled: value,
       });
+      console.log('Location setting updated successfully');
     } catch (error) {
       console.error("Failed to update location setting:", error);
       Alert.alert("Error", "Failed to update location setting");
@@ -92,15 +101,20 @@ export default function SettingsScreen() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            onPress={() => {
+              console.log('Back button pressed in settings');
+              router.back();
+            }}
           >
-            <GlassCard intensity={20} style={styles.backButtonGlass}>
-               <ChevronLeft size={24} color={Colors.white} />
-            </GlassCard>
+            <BlurView intensity={20} tint="dark" style={styles.backButtonBlur}>
+              <ChevronLeft
+                size={24}
+                color={Colors.white}
+              />
+            </BlurView>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Account Settings</Text>
-          <View style={styles.placeholderButton} />
+          <View style={styles.backButton} />
         </View>
 
         <ScrollView
@@ -110,10 +124,10 @@ export default function SettingsScreen() {
         >
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Location</Text>
-            <GlassCard intensity={15} style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <MapPin size={24} color={Colors.babyBlue} />
+                  <MapPin size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Location Services</Text>
                     <Text style={styles.settingDescription}>
@@ -140,7 +154,7 @@ export default function SettingsScreen() {
                     onPress={handleDistanceChange}
                   >
                     <View style={styles.settingLeft}>
-                      <Globe size={24} color={Colors.pastelYellow} />
+                      <Globe size={24} color={Colors.textSecondary} />
                       <View style={styles.settingTextContainer}>
                         <Text style={styles.settingTitle}>Maximum Distance</Text>
                         <Text style={styles.settingDescription}>
@@ -148,63 +162,22 @@ export default function SettingsScreen() {
                         </Text>
                       </View>
                     </View>
-                    <ChevronRight size={20} color={Colors.textTertiary} />
+                    <ChevronRight size={20} color={Colors.textSecondary} />
                   </TouchableOpacity>
                 </>
               )}
-              <View style={styles.divider} />
-
-              <View style={styles.settingRow}>
-                <View style={styles.settingLeft}>
-                  <MapPin size={24} color={Colors.pastelYellow} />
-                  <View style={styles.settingTextContainer}>
-                    <Text style={styles.settingTitle}>Show Distance</Text>
-                    <Text style={styles.settingDescription}>
-                      Display your distance to others
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={showDistance}
-                  onValueChange={setShowDistance}
-                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
-                  thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.glass}
-                />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.settingRow}>
-                <View style={styles.settingLeft}>
-                  <MessageCircle size={24} color={Colors.babyBlue} />
-                  <View style={styles.settingTextContainer}>
-                    <Text style={styles.settingTitle}>Messages</Text>
-                    <Text style={styles.settingDescription}>
-                      When you receive a message
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={messageNotifications}
-                  onValueChange={setMessageNotifications}
-                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
-                  thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.glass}
-                />
-              </View>
-            </GlassCard>
+            </BlurView>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Profile Settings</Text>
-            <GlassCard intensity={15} style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <TouchableOpacity
                 style={styles.settingRow}
-                onPress={() => router.push("/edit-profile")}
+                onPress={() => router.push("/edit-profile" as any)}
               >
                 <View style={styles.settingLeft}>
-                  <User size={24} color={Colors.accent} />
+                  <User size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Edit Profile</Text>
                     <Text style={styles.settingDescription}>
@@ -212,58 +185,17 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color={Colors.textTertiary} />
+                <ChevronRight size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
-              <View style={styles.divider} />
-
-              <View style={styles.settingRow}>
-                <View style={styles.settingLeft}>
-                  <MapPin size={24} color={Colors.pastelYellow} />
-                  <View style={styles.settingTextContainer}>
-                    <Text style={styles.settingTitle}>Show Distance</Text>
-                    <Text style={styles.settingDescription}>
-                      Display your distance to others
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={showDistance}
-                  onValueChange={setShowDistance}
-                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
-                  thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.glass}
-                />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.settingRow}>
-                <View style={styles.settingLeft}>
-                  <MessageCircle size={24} color={Colors.babyBlue} />
-                  <View style={styles.settingTextContainer}>
-                    <Text style={styles.settingTitle}>Messages</Text>
-                    <Text style={styles.settingDescription}>
-                      When you receive a message
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={messageNotifications}
-                  onValueChange={setMessageNotifications}
-                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
-                  thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.glass}
-                />
-              </View>
-            </GlassCard>
+            </BlurView>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Notifications</Text>
-            <GlassCard intensity={15} style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <Bell size={24} color={Colors.babyBlue} />
+                  <Bell size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Push Notifications</Text>
                     <Text style={styles.settingDescription}>
@@ -284,28 +216,7 @@ export default function SettingsScreen() {
 
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <MapPin size={24} color={Colors.pastelYellow} />
-                  <View style={styles.settingTextContainer}>
-                    <Text style={styles.settingTitle}>Show Distance</Text>
-                    <Text style={styles.settingDescription}>
-                      Display your distance to others
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={showDistance}
-                  onValueChange={setShowDistance}
-                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
-                  thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.glass}
-                />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.settingRow}>
-                <View style={styles.settingLeft}>
-                  <Smartphone size={24} color={Colors.pastelYellow} />
+                  <Smartphone size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Email Notifications</Text>
                     <Text style={styles.settingDescription}>
@@ -326,28 +237,7 @@ export default function SettingsScreen() {
 
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <MapPin size={24} color={Colors.pastelYellow} />
-                  <View style={styles.settingTextContainer}>
-                    <Text style={styles.settingTitle}>Show Distance</Text>
-                    <Text style={styles.settingDescription}>
-                      Display your distance to others
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={showDistance}
-                  onValueChange={setShowDistance}
-                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
-                  thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.glass}
-                />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.settingRow}>
-                <View style={styles.settingLeft}>
-                  <Check size={24} color={Colors.accent} />
+                  <Check size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>New Matches</Text>
                     <Text style={styles.settingDescription}>
@@ -363,32 +253,12 @@ export default function SettingsScreen() {
                   ios_backgroundColor={Colors.glass}
                 />
               </View>
-              <View style={styles.divider} />
-
-              <View style={styles.settingRow}>
-                <View style={styles.settingLeft}>
-                  <MapPin size={24} color={Colors.pastelYellow} />
-                  <View style={styles.settingTextContainer}>
-                    <Text style={styles.settingTitle}>Show Distance</Text>
-                    <Text style={styles.settingDescription}>
-                      Display your distance to others
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={showDistance}
-                  onValueChange={setShowDistance}
-                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
-                  thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.glass}
-                />
-              </View>
 
               <View style={styles.divider} />
 
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <MessageCircle size={24} color={Colors.babyBlue} />
+                  <Bell size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Messages</Text>
                     <Text style={styles.settingDescription}>
@@ -404,15 +274,15 @@ export default function SettingsScreen() {
                   ios_backgroundColor={Colors.glass}
                 />
               </View>
-            </GlassCard>
+            </BlurView>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Privacy & Safety</Text>
-            <GlassCard intensity={15} style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <Eye size={24} color={Colors.babyBlue} />
+                  <Eye size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Show Online Status</Text>
                     <Text style={styles.settingDescription}>
@@ -433,7 +303,7 @@ export default function SettingsScreen() {
 
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <MapPin size={24} color={Colors.pastelYellow} />
+                  <MapPin size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Show Distance</Text>
                     <Text style={styles.settingDescription}>
@@ -454,7 +324,7 @@ export default function SettingsScreen() {
 
               <View style={styles.settingRow}>
                 <View style={styles.settingLeft}>
-                  <Shield size={24} color={Colors.accent} />
+                  <Shield size={24} color={Colors.textSecondary} />
                   <View style={styles.settingTextContainer}>
                     <Text style={styles.settingTitle}>Incognito Mode</Text>
                     <Text style={styles.settingDescription}>
@@ -470,56 +340,18 @@ export default function SettingsScreen() {
                   ios_backgroundColor={Colors.glass}
                 />
               </View>
-              <View style={styles.divider} />
-
-              <View style={styles.settingRow}>
-                <View style={styles.settingLeft}>
-                  <MapPin size={24} color={Colors.pastelYellow} />
-                  <View style={styles.settingTextContainer}>
-                    <Text style={styles.settingTitle}>Show Distance</Text>
-                    <Text style={styles.settingDescription}>
-                      Display your distance to others
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={showDistance}
-                  onValueChange={setShowDistance}
-                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
-                  thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.glass}
-                />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.settingRow}>
-                <View style={styles.settingLeft}>
-                  <MessageCircle size={24} color={Colors.babyBlue} />
-                  <View style={styles.settingTextContainer}>
-                    <Text style={styles.settingTitle}>Messages</Text>
-                    <Text style={styles.settingDescription}>
-                      When you receive a message
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={messageNotifications}
-                  onValueChange={setMessageNotifications}
-                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
-                  thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.glass}
-                />
-              </View>
-            </GlassCard>
+            </BlurView>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Legal & About</Text>
-            <GlassCard intensity={15} style={styles.card}>
+            <BlurView intensity={20} tint="dark" style={styles.card}>
               <TouchableOpacity 
                 style={styles.settingRow}
-                onPress={() => router.push("/terms")}
+                onPress={() => {
+                  console.log('Navigating to terms');
+                  router.push("/terms" as any);
+                }}
               >
                 <View style={styles.settingLeft}>
                   <FileText size={24} color={Colors.textSecondary} />
@@ -530,14 +362,17 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color={Colors.textTertiary} />
+                <ChevronRight size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
 
               <View style={styles.divider} />
 
               <TouchableOpacity 
                 style={styles.settingRow}
-                onPress={() => router.push("/privacy-policy")}
+                onPress={() => {
+                  console.log('Navigating to privacy-policy');
+                  router.push("/privacy-policy" as any);
+                }}
               >
                 <View style={styles.settingLeft}>
                   <Shield size={24} color={Colors.textSecondary} />
@@ -548,14 +383,17 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color={Colors.textTertiary} />
+                <ChevronRight size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
 
               <View style={styles.divider} />
 
               <TouchableOpacity 
                 style={styles.settingRow}
-                onPress={() => router.push("/about")}
+                onPress={() => {
+                  console.log('Navigating to about');
+                  router.push("/about" as any);
+                }}
               >
                 <View style={styles.settingLeft}>
                   <Info size={24} color={Colors.textSecondary} />
@@ -566,9 +404,20 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color={Colors.textTertiary} />
+                <ChevronRight size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
-            </GlassCard>
+
+              <View style={styles.divider} />
+
+              <TouchableOpacity style={styles.settingRow}>
+                <View style={styles.settingLeft}>
+                  <View style={styles.settingTextContainer}>
+                    <Text style={styles.settingTitle}>Version</Text>
+                    <Text style={styles.settingDescription}>1.0.0</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </BlurView>
           </View>
 
           <View style={styles.bottomSpacer} />
@@ -603,16 +452,15 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-  },
-  backButtonGlass: {
-    width: 40,
-    height: 40,
     borderRadius: 20,
+    overflow: 'hidden',
+  },
+  backButtonBlur: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  placeholderButton: {
-    width: 40,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   headerTitle: {
     fontSize: 20,
@@ -634,10 +482,12 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: Colors.white,
     marginBottom: 12,
-    marginLeft: 4,
   },
   card: {
-    borderRadius: 24,
+    borderRadius: 16,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   settingRow: {
     flexDirection: "row",
@@ -648,7 +498,7 @@ const styles = StyleSheet.create({
   settingLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
+    gap: 12,
     flex: 1,
   },
   settingTextContainer: {
@@ -668,7 +518,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: Colors.glassBorder,
-    marginLeft: 56, // Align with text
+    marginLeft: 52,
   },
   bottomSpacer: {
     height: 20,

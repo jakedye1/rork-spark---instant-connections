@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Flame, MessageCircle, User, Video } from "lucide-react-native";
+import { Flame, MessageCircle, User } from "lucide-react-native";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { BlurView } from "expo-blur";
@@ -16,48 +16,45 @@ export default function TabLayout() {
           position: "absolute",
           backgroundColor: "transparent",
           borderTopWidth: 0,
-          elevation: 0,
           height: Platform.OS === 'ios' ? 88 : 68,
+          paddingTop: 8,
+          paddingBottom: Platform.OS === 'ios' ? 24 : 8,
+          elevation: 0,
         },
         tabBarBackground: () => (
-          <View style={styles.dockContainer}>
-             <BlurView intensity={80} tint="dark" style={styles.dockBlur} />
-             <View style={styles.dockBorder} />
+          <View style={styles.tabBarBackground}>
+            <BlurView 
+              intensity={80} 
+              tint="dark" 
+              style={styles.tabBarBlur}
+            >
+              <View style={styles.tabBarGradient} />
+            </BlurView>
           </View>
         ),
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: "600",
-          marginBottom: 4,
+          fontSize: 12,
+          fontWeight: "700" as const,
+          letterSpacing: 0.3,
+          marginTop: 4,
         },
-        tabBarShowLabel: true,
+        tabBarHideOnKeyboard: Platform.OS !== 'ios',
+        tabBarItemStyle: {
+          paddingVertical: 4,
+        },
       }}
     >
       <Tabs.Screen
         name="home"
         options={{
-          title: "Home",
+          title: "Flare",
           tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.iconWrapper, focused && styles.iconWrapperActive]}>
+            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
               <Flame 
-                size={24} 
+                size={focused ? 26 : 24} 
                 color={color} 
-                fill={focused ? color : "transparent"} 
-              />
-            </View>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="match"
-        options={{
-          title: "Live Match",
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.iconWrapper, focused && styles.iconWrapperActive]}>
-              <Video 
-                size={24} 
-                color={color}
-                fill={focused ? color : "transparent"} 
+                fill={focused ? color : "transparent"}
+                strokeWidth={focused ? 2.5 : 2}
               />
             </View>
           ),
@@ -68,10 +65,11 @@ export default function TabLayout() {
         options={{
           title: "Messages",
           tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.iconWrapper, focused && styles.iconWrapperActive]}>
+            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
               <MessageCircle 
-                size={24} 
+                size={focused ? 26 : 24} 
                 color={color}
+                strokeWidth={focused ? 2.5 : 2}
               />
             </View>
           ),
@@ -82,10 +80,11 @@ export default function TabLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.iconWrapper, focused && styles.iconWrapperActive]}>
+            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
               <User 
-                size={24} 
+                size={focused ? 26 : 24} 
                 color={color}
+                strokeWidth={focused ? 2.5 : 2}
               />
             </View>
           ),
@@ -96,39 +95,36 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  dockContainer: {
-    position: "absolute",
+  tabBarBackground: {
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
     bottom: 0,
-    left: 0,
-    right: 0,
-    top: 0,
+  },
+  tabBarBlur: {
+    flex: 1,
     overflow: "hidden",
-    backgroundColor: "rgba(11, 11, 13, 0.8)", // Semi-transparent background
   },
-  dockBlur: {
-    ...StyleSheet.absoluteFillObject,
+  tabBarGradient: {
+    flex: 1,
+    backgroundColor: Colors.glass,
+    borderTopWidth: 1,
+    borderTopColor: Colors.glassBorder,
   },
-  dockBorder: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: Colors.glassBorder,
-  },
-  iconWrapper: {
-    width: 48,
-    height: 32,
+  iconContainer: {
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 16,
-    marginBottom: 4,
   },
-  iconWrapperActive: {
+  iconContainerActive: {
     backgroundColor: "rgba(130, 199, 255, 0.15)",
-    shadowColor: Colors.babyBlue,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
+    shadowColor: Colors.shadowNeon,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 4,
   },
 });
