@@ -30,7 +30,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/colors";
-import { useRorkAgent, createRorkTool } from "@rork-ai/toolkit-sdk";
+import { useRorkAgent, createRorkTool } from "@rork/toolkit-sdk";
 import { z } from "zod";
 
 type FAQItem = {
