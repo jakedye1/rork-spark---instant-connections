@@ -1,20 +1,20 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { MessageCircle, Send, Search } from "lucide-react-native";
+import { MessageCircle, Send } from "lucide-react-native";
 import React, { useState } from "react";
 import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  RefreshControl,
+	  StyleSheet,
+	  Text,
+	  View,
+	  TouchableOpacity,
+	  ScrollView,
+	  TextInput,
+	  KeyboardAvoidingView,
+	  Platform,
+	  RefreshControl,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/colors";
-
+	
 type Match = {
   id: string;
   name: string;
@@ -23,7 +23,6 @@ type Match = {
   timestamp: string;
   unread: number;
   interests: string[];
-  type: "date" | "friend" | "group";
 };
 
 type Message = {
@@ -32,7 +31,7 @@ type Message = {
   sender: "me" | "them";
   timestamp: string;
 };
-
+	
 const MATCHES: Match[] = [
   {
     id: "1",
@@ -42,7 +41,6 @@ const MATCHES: Match[] = [
     timestamp: "2m ago",
     unread: 2,
     interests: ["🎮 Gaming", "🎵 Music", "🌍 Travel"],
-    type: "date",
   },
   {
     id: "2",
@@ -52,7 +50,6 @@ const MATCHES: Match[] = [
     timestamp: "1h ago",
     unread: 0,
     interests: ["☕ Coffee", "📚 Reading", "🎨 Art"],
-    type: "friend",
   },
   {
     id: "3",
@@ -62,7 +59,6 @@ const MATCHES: Match[] = [
     timestamp: "3h ago",
     unread: 1,
     interests: ["🏋️ Fitness", "🍜 Food", "🎬 Movies"],
-    type: "group",
   },
 ];
 
@@ -70,7 +66,6 @@ export default function WhatsThePlanScreen() {
   const insets = useSafeAreaInsets();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [messageText, setMessageText] = useState("");
-  const [searchText, setSearchText] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -126,185 +121,156 @@ export default function WhatsThePlanScreen() {
     }, 1000);
   }, []);
 
-  const filteredMatches = MATCHES.filter(match => 
-    match.name.toLowerCase().includes(searchText.toLowerCase())
-  );
-
   if (selectedMatch) {
     return (
-      <View style={styles.container}>
-        <LinearGradient
-          colors={[Colors.background, Colors.backgroundLight]}
-          style={styles.container}
+      <LinearGradient
+        colors={[Colors.babyBlue, Colors.pastelYellow]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.container}
+      >
+        <KeyboardAvoidingView
+          style={styles.chatContainer}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={0}
         >
-          <KeyboardAvoidingView
-            style={styles.chatContainer}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={0}
-          >
-            <View style={[styles.chatHeader, { paddingTop: insets.top + 16 }]}>
-              <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => setSelectedMatch(null)}
-              >
-                <Text style={styles.backButtonText}>←</Text>
-              </TouchableOpacity>
-              <View style={styles.chatHeaderInfo}>
-                <View style={styles.chatHeaderAvatarContainer}>
-                  <Text style={styles.chatHeaderAvatar}>{selectedMatch.avatar}</Text>
-                </View>
-                <View style={styles.chatHeaderText}>
-                  <Text style={styles.chatHeaderName}>{selectedMatch.name}</Text>
-                  <View style={styles.interestsRowSmall}>
-                    {selectedMatch.interests.slice(0, 2).map((interest, idx) => (
-                      <Text key={idx} style={styles.interestSmall}>{interest.split(" ")[0]}</Text>
-                    ))}
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            <ScrollView
-              style={styles.messagesContainer}
-              contentContainerStyle={styles.messagesContent}
-              showsVerticalScrollIndicator={false}
-              keyboardDismissMode="interactive"
+          <View style={[styles.chatHeader, { paddingTop: insets.top + 12 }]}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => setSelectedMatch(null)}
             >
-              {messages.map((message) => (
-                <View
-                  key={message.id}
-                  style={[
-                    styles.messageBubble,
-                    message.sender === "me" ? styles.myMessage : styles.theirMessage,
-                  ]}
-                >
-                  <Text style={[styles.messageText, message.sender === "me" && styles.myMessageText]}>{message.text}</Text>
-                  <Text style={[styles.messageTime, message.sender === "me" && styles.myMessageTime]}>{message.timestamp}</Text>
+              <Text style={styles.backButtonText}>←</Text>
+            </TouchableOpacity>
+            <View style={styles.chatHeaderInfo}>
+              <Text style={styles.chatHeaderAvatar}>{selectedMatch.avatar}</Text>
+              <View style={styles.chatHeaderText}>
+                <Text style={styles.chatHeaderName}>{selectedMatch.name}</Text>
+                <View style={styles.interestsRowSmall}>
+                  {selectedMatch.interests.slice(0, 2).map((interest, idx) => (
+                    <Text key={idx} style={styles.interestSmall}>{interest.split(" ")[0]}</Text>
+                  ))}
                 </View>
-              ))}
-            </ScrollView>
-
-            <View style={[styles.inputSection, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Type a message..."
-                  placeholderTextColor={Colors.textTertiary}
-                  value={messageText}
-                  onChangeText={setMessageText}
-                  multiline
-                />
-                <TouchableOpacity
-                  style={styles.sendButton}
-                  onPress={handleSendMessage}
-                >
-                  <Send size={20} color={Colors.white} />
-                </TouchableOpacity>
               </View>
             </View>
-          </KeyboardAvoidingView>
-        </LinearGradient>
-      </View>
+          </View>
+
+          <ScrollView
+            style={styles.messagesContainer}
+            contentContainerStyle={styles.messagesContent}
+            showsVerticalScrollIndicator={false}
+            keyboardDismissMode="interactive"
+          >
+            {messages.map((message) => (
+              <View
+                key={message.id}
+                style={[
+                  styles.messageBubble,
+                  message.sender === "me" ? styles.myMessage : styles.theirMessage,
+                ]}
+              >
+                <Text style={styles.messageText}>{message.text}</Text>
+                <Text style={styles.messageTime}>{message.timestamp}</Text>
+              </View>
+            ))}
+          </ScrollView>
+
+          <View style={[styles.planDateSection, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Type a message..."
+                placeholderTextColor={Colors.mediumGray}
+                value={messageText}
+                onChangeText={setMessageText}
+                multiline
+              />
+              <TouchableOpacity
+                style={styles.sendButton}
+                onPress={handleSendMessage}
+              >
+                <Send size={20} color={Colors.white} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </LinearGradient>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        colors={[Colors.background, Colors.backgroundLight]}
-        style={styles.container}
+    <LinearGradient
+      colors={[Colors.babyBlue, Colors.pastelYellow]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
+        showsVerticalScrollIndicator={false}
+        keyboardDismissMode="on-drag"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.charcoal} />
+        }
       >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
-          showsVerticalScrollIndicator={false}
-          keyboardDismissMode="on-drag"
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
-          }
-        >
-          <View style={styles.header}>
-            <Text style={styles.title}>Messages</Text>
-            <Text style={styles.subtitle}>
-              Connect with your matches
-            </Text>
-          </View>
+        <View style={styles.header}>
+          <Text style={styles.title}>What&apos;s the Plan?</Text>
+          <Text style={styles.subtitle}>
+            Message your matches and plan your first date
+          </Text>
+        </View>
 
-          <View style={styles.searchContainer}>
-            <View style={styles.searchWrapper}>
-              <Search size={20} color={Colors.textSecondary} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search conversations..."
-                placeholderTextColor={Colors.textTertiary}
-                value={searchText}
-                onChangeText={setSearchText}
-              />
-            </View>
-          </View>
-
-          <View style={styles.matchesContainer}>
-            {filteredMatches.map((match) => (
-              <TouchableOpacity
-                key={match.id}
-                style={styles.matchCard}
-                onPress={() => setSelectedMatch(match)}
-                activeOpacity={0.8}
-              >
-                <LinearGradient
-                  colors={
-                    match.type === "date"
-                      ? Colors.gradient1 as [string, string, ...string[]]
-                      : match.type === "group"
-                      ? Colors.gradient3 as [string, string, ...string[]]
-                      : Colors.gradient2 as [string, string, ...string[]]
-                  }
-                  style={styles.matchAvatarGradient}
-                >
-                  <Text style={styles.matchAvatarEmoji}>{match.avatar}</Text>
-                </LinearGradient>
+        <View style={styles.matchesContainer}>
+          {MATCHES.map((match) => (
+            <TouchableOpacity
+              key={match.id}
+              style={styles.matchCard}
+              onPress={() => setSelectedMatch(match)}
+            >
+              <View style={styles.matchAvatar}>
+                <Text style={styles.matchAvatarEmoji}>{match.avatar}</Text>
                 {match.unread > 0 && (
                   <View style={styles.unreadBadge}>
                     <Text style={styles.unreadText}>{match.unread}</Text>
                   </View>
                 )}
+              </View>
 
-                <View style={styles.matchInfo}>
-                  <View style={styles.matchHeader}>
-                    <Text style={styles.matchName}>{match.name}</Text>
-                    <Text style={styles.matchTimestamp}>{match.timestamp}</Text>
-                  </View>
-                  <Text style={styles.matchLastMessage} numberOfLines={1}>
-                    {match.lastMessage}
-                  </Text>
-                  <View style={styles.interestsRow}>
-                    {match.interests.map((interest, idx) => (
-                      <View key={idx} style={styles.interestTag}>
-                        <Text style={styles.interestText}>{interest}</Text>
-                      </View>
-                    ))}
-                  </View>
+              <View style={styles.matchInfo}>
+                <View style={styles.matchHeader}>
+                  <Text style={styles.matchName}>{match.name}</Text>
+                  <Text style={styles.matchTimestamp}>{match.timestamp}</Text>
                 </View>
+                <Text style={styles.matchLastMessage} numberOfLines={1}>
+                  {match.lastMessage}
+                </Text>
+                <View style={styles.interestsRow}>
+                  {match.interests.map((interest, idx) => (
+                    <View key={idx} style={styles.interestTag}>
+                      <Text style={styles.interestText}>{interest}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
 
-                <MessageCircle size={24} color={Colors.textTertiary} />
-              </TouchableOpacity>
-            ))}
-          </View>
+              <MessageCircle size={24} color={Colors.charcoal} opacity={0.3} />
+            </TouchableOpacity>
+          ))}
+        </View>
 
-          <View style={styles.infoBox}>
-            <Text style={styles.infoTitle}>💬 Conversation Tips</Text>
-            <Text style={styles.infoText}>
-              • Ask about their interests{"\n"}
-              • Suggest specific date ideas{"\n"}
-              • Be genuine and respectful{"\n"}
-              • Start conversations that lead to connections
-            </Text>
-          </View>
+        <View style={styles.infoBox}>
+          <Text style={styles.infoTitle}>💡 Tips for Great Conversations</Text>
+          <Text style={styles.infoText}>
+            • Ask about their interests{"\n"}
+            • Suggest specific date ideas{"\n"}
+            • Be genuine and respectful{"\n"}
+            • Start conversations that lead to great connections
+          </Text>
+        </View>
 
-          <View style={styles.bottomSpacer} />
-        </ScrollView>
-      </LinearGradient>
-    </View>
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
@@ -323,84 +289,67 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontSize: 36,
-    fontWeight: "800" as const,
-    color: Colors.text,
+    fontSize: 32,
+    fontWeight: "700" as const,
+    color: Colors.charcoal,
     marginBottom: 8,
-    letterSpacing: -1,
   },
   subtitle: {
-    fontSize: 17,
-    fontWeight: "500" as const,
-    color: Colors.textSecondary,
-  },
-  searchContainer: {
-    marginBottom: 24,
-  },
-  searchWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    height: 52,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    gap: 12,
-  },
-  searchInput: {
-    flex: 1,
     fontSize: 16,
-    color: Colors.text,
     fontWeight: "500" as const,
+    color: Colors.charcoal,
+    opacity: 0.7,
   },
   matchesContainer: {
-    gap: 14,
+    gap: 12,
     marginBottom: 24,
   },
   matchCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: 20,
+    backgroundColor: Colors.white,
+    borderRadius: 16,
     padding: 16,
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    position: "relative" as const,
+    gap: 12,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  matchAvatarGradient: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+  matchAvatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.lightGray,
     alignItems: "center",
     justifyContent: "center",
+    position: "relative" as const,
   },
   matchAvatarEmoji: {
-    fontSize: 32,
+    fontSize: 28,
   },
   unreadBadge: {
     position: "absolute" as const,
-    top: 12,
-    left: 60,
-    backgroundColor: Colors.primary,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    top: -4,
+    right: -4,
+    backgroundColor: Colors.pastelYellow,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: Colors.surface,
+    borderColor: Colors.white,
   },
   unreadText: {
-    fontSize: 11,
-    fontWeight: "800" as const,
-    color: Colors.white,
-    letterSpacing: -0.5,
+    fontSize: 10,
+    fontWeight: "700" as const,
+    color: Colors.charcoal,
   },
   matchInfo: {
     flex: 1,
-    gap: 6,
+    gap: 4,
   },
   matchHeader: {
     flexDirection: "row",
@@ -408,19 +357,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   matchName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "700" as const,
-    color: Colors.text,
+    color: Colors.charcoal,
   },
   matchTimestamp: {
-    fontSize: 13,
-    fontWeight: "600" as const,
-    color: Colors.textTertiary,
+    fontSize: 12,
+    fontWeight: "500" as const,
+    color: Colors.mediumGray,
   },
   matchLastMessage: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "500" as const,
-    color: Colors.textSecondary,
+    color: Colors.charcoal,
+    opacity: 0.7,
   },
   interestsRow: {
     flexDirection: "row",
@@ -429,34 +379,38 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   interestTag: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    backgroundColor: Colors.backgroundElevated,
-    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    backgroundColor: Colors.lightGray,
+    borderRadius: 8,
   },
   interestText: {
-    fontSize: 12,
-    fontWeight: "600" as const,
-    color: Colors.text,
+    fontSize: 11,
+    fontWeight: "500" as const,
+    color: Colors.charcoal,
   },
   infoBox: {
-    backgroundColor: Colors.surface,
-    borderRadius: 20,
-    padding: 24,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 2,
   },
   infoTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700" as const,
-    color: Colors.text,
-    marginBottom: 14,
+    color: Colors.charcoal,
+    marginBottom: 12,
   },
   infoText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "500" as const,
-    color: Colors.textSecondary,
-    lineHeight: 24,
+    color: Colors.charcoal,
+    opacity: 0.7,
+    lineHeight: 22,
   },
   bottomSpacer: {
     height: 20,
@@ -465,27 +419,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   chatHeader: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.white,
     paddingHorizontal: 16,
-    paddingBottom: 14,
+    paddingBottom: 12,
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    gap: 12,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 3,
   },
   backButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: Colors.backgroundElevated,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.lightGray,
     alignItems: "center",
     justifyContent: "center",
   },
   backButtonText: {
-    fontSize: 22,
-    color: Colors.text,
-    fontWeight: "600" as const,
+    fontSize: 20,
+    color: Colors.charcoal,
   },
   chatHeaderInfo: {
     flex: 1,
@@ -493,16 +449,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
-  chatHeaderAvatarContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: Colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   chatHeaderAvatar: {
-    fontSize: 24,
+    fontSize: 32,
   },
   chatHeaderText: {
     flex: 1,
@@ -510,12 +458,12 @@ const styles = StyleSheet.create({
   chatHeaderName: {
     fontSize: 18,
     fontWeight: "700" as const,
-    color: Colors.text,
-    marginBottom: 2,
+    color: Colors.charcoal,
   },
   interestsRowSmall: {
     flexDirection: "row",
-    gap: 6,
+    gap: 4,
+    marginTop: 2,
   },
   interestSmall: {
     fontSize: 14,
@@ -529,76 +477,64 @@ const styles = StyleSheet.create({
   },
   messageBubble: {
     maxWidth: "75%",
-    padding: 14,
-    borderRadius: 18,
-    marginBottom: 4,
+    padding: 12,
+    borderRadius: 16,
+    marginBottom: 8,
   },
   myMessage: {
     alignSelf: "flex-end",
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.pastelYellow,
   },
   theirMessage: {
     alignSelf: "flex-start",
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    backgroundColor: Colors.white,
   },
   messageText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "500" as const,
-    color: Colors.text,
-    marginBottom: 6,
-    lineHeight: 22,
-  },
-  myMessageText: {
-    color: Colors.white,
+    color: Colors.charcoal,
+    marginBottom: 4,
   },
   messageTime: {
-    fontSize: 12,
-    fontWeight: "600" as const,
-    color: Colors.textTertiary,
+    fontSize: 11,
+    fontWeight: "500" as const,
+    color: Colors.charcoal,
+    opacity: 0.5,
   },
-  myMessageTime: {
-    color: Colors.white,
-    opacity: 0.7,
-  },
-  inputSection: {
-    backgroundColor: Colors.surface,
+  planDateSection: {
+    backgroundColor: Colors.white,
     paddingHorizontal: 16,
     paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    gap: 12,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 3,
   },
+
   inputContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 10,
-    marginBottom: 12,
+    gap: 8,
   },
   input: {
     flex: 1,
-    backgroundColor: Colors.backgroundElevated,
-    borderRadius: 22,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    fontSize: 16,
+    backgroundColor: Colors.lightGray,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    fontSize: 15,
     fontWeight: "500" as const,
-    color: Colors.text,
+    color: Colors.charcoal,
     maxHeight: 100,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
   sendButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: Colors.primary,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.charcoal,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
   },
 });

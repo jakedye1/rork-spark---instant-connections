@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { Video, Shield, Zap, Users, MapPin, Heart, Check, Sparkles } from "lucide-react-native";
+import { Video, Shield, Zap, Users, MapPin, Heart, Check } from "lucide-react-native";
 import React, { useState, useRef } from "react";
 import {
   StyleSheet,
@@ -8,7 +8,6 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/colors";
@@ -23,25 +22,6 @@ export default function OnboardingScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState<boolean>(false);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
-
-  React.useEffect(() => {
-    fadeAnim.setValue(0);
-    slideAnim.setValue(30);
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [step]);
 
   const handleNext = async () => {
     if (step === "welcome") {
@@ -57,9 +37,13 @@ export default function OnboardingScreen() {
     }
   };
 
+
+
   return (
     <LinearGradient
-      colors={Colors.gradientDark as [string, string, ...string[]]}
+      colors={[Colors.babyBlue, Colors.pastelYellow]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
       style={styles.container}
     >
       <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
@@ -78,157 +62,153 @@ export default function OnboardingScreen() {
           showsVerticalScrollIndicator={false}
           keyboardDismissMode="on-drag"
         >
-          <Animated.View 
-            style={[
-              styles.stepContainer,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              },
-            ]}
-          >
-            {step === "welcome" && (
-              <View style={styles.content}>
-                <View style={styles.heroIconContainer}>
-                  <LinearGradient
-                    colors={Colors.gradientHero as [string, string, ...string[]]}
-                    style={styles.heroIconGradient}
-                  >
-                    <Sparkles size={64} color={Colors.white} strokeWidth={2} />
-                  </LinearGradient>
-                </View>
-
-                <Text style={styles.title}>Welcome to Spark</Text>
-                <Text style={styles.subtitle}>
-                  Real connections happen instantly. Skip the endless swiping and jump straight into live conversations.
-                </Text>
-              </View>
-            )}
-
-            {step === "how-it-works" && (
-              <View style={styles.content}>
-                <Text style={styles.title}>How It Works</Text>
-                <Text style={styles.subtitle}>Connect in 3 simple steps</Text>
-
-                <View style={styles.featuresContainer}>
-                  <View style={styles.featureCard}>
-                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.primary + "20" }]}>
-                      <Zap size={28} color={Colors.primary} strokeWidth={2.5} />
-                    </View>
-                    <Text style={styles.featureTitle}>1. AI Matches You</Text>
-                    <Text style={styles.featureDescription}>
-                      Our smart AI finds people nearby who share your interests and preferences in seconds.
-                    </Text>
-                  </View>
-
-                  <View style={styles.featureCard}>
-                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.secondary + "20" }]}>
-                      <Video size={28} color={Colors.secondary} strokeWidth={2.5} />
-                    </View>
-                    <Text style={styles.featureTitle}>2. Live Video Chat</Text>
-                    <Text style={styles.featureDescription}>
-                      Jump into The Flare for instant 1-on-1 video calls. 5 seconds to decide, up to 1 minute to connect.
-                    </Text>
-                  </View>
-
-                  <View style={styles.featureCard}>
-                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.accent + "20" }]}>
-                      <Heart size={28} color={Colors.accent} strokeWidth={2.5} />
-                    </View>
-                    <Text style={styles.featureTitle}>3. Make Real Plans</Text>
-                    <Text style={styles.featureDescription}>
-                      Both say yes? Share contacts and plan your first date or hangout instantly.
-                    </Text>
+          {step === "welcome" && (
+            <View style={styles.stepContainer}>
+              <View style={styles.sparkContainer}>
+                <View style={styles.sparkOuter}>
+                  <View style={styles.sparkInner}>
+                    <Text style={styles.sparkEmoji}>✨</Text>
                   </View>
                 </View>
               </View>
-            )}
 
-            {step === "privacy" && (
-              <View style={styles.content}>
-                <Text style={styles.title}>Your Safety First</Text>
-                <Text style={styles.subtitle}>We take your privacy seriously</Text>
+              <Text style={styles.title}>Welcome to Spark</Text>
+              <Text style={styles.subtitle}>
+                Real connections, instantly. Skip the waiting and jump straight into live
+                conversations with people who share your interests.
+              </Text>
+            </View>
+          )}
 
-                <View style={styles.featuresContainer}>
-                  <View style={styles.featureCard}>
-                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.success + "20" }]}>
-                      <Shield size={28} color={Colors.success} strokeWidth={2.5} />
-                    </View>
-                    <Text style={styles.featureTitle}>Face ID Verification</Text>
-                    <Text style={styles.featureDescription}>
-                      All users must verify their identity through facial recognition. Only real people, no bots.
-                    </Text>
+          {step === "how-it-works" && (
+            <View style={styles.stepContainer}>
+              <Text style={styles.title}>How It Works</Text>
+              <Text style={styles.subtitle}>Connect in 3 simple steps</Text>
+
+              <View style={styles.featuresContainer}>
+                <View style={styles.featureCard}>
+                  <View style={styles.featureIconContainer}>
+                    <Zap size={32} color={Colors.charcoal} />
                   </View>
-
-                  <View style={styles.featureCard}>
-                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.info + "20" }]}>
-                      <MapPin size={28} color={Colors.info} strokeWidth={2.5} />
-                    </View>
-                    <Text style={styles.featureTitle}>Location Control</Text>
-                    <Text style={styles.featureDescription}>
-                      You control your search radius. Your exact location is never shared with other users.
-                    </Text>
-                  </View>
-
-                  <View style={styles.featureCard}>
-                    <View style={[styles.featureIconContainer, { backgroundColor: Colors.warning + "20" }]}>
-                      <Users size={28} color={Colors.warning} strokeWidth={2.5} />
-                    </View>
-                    <Text style={styles.featureTitle}>AI Moderation</Text>
-                    <Text style={styles.featureDescription}>
-                      Advanced AI monitors video chats for inappropriate behavior to keep everyone safe.
-                    </Text>
-                  </View>
+                  <Text style={styles.featureTitle}>1. AI Matches You</Text>
+                  <Text style={styles.featureDescription}>
+                    Our smart AI finds people nearby who share your interests and
+                    preferences in seconds.
+                  </Text>
                 </View>
 
-                <View style={styles.agreementContainer}>
-                  <TouchableOpacity
-                    style={styles.checkboxRow}
-                    onPress={() => setAcceptedTerms(!acceptedTerms)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={[styles.checkbox, acceptedTerms && styles.checkboxChecked]}>
-                      {acceptedTerms && <Check size={16} color={Colors.white} strokeWidth={3} />}
-                    </View>
-                    <Text style={styles.agreementText}>
-                      I agree to the{" "}
-                      <Text
-                        style={styles.linkText}
-                        onPress={(e) => {
-                          e.stopPropagation();
-                          router.push("/terms");
-                        }}
-                      >
-                        Terms of Service
-                      </Text>
-                    </Text>
-                  </TouchableOpacity>
+                <View style={styles.featureCard}>
+                  <View style={styles.featureIconContainer}>
+                    <Video size={32} color={Colors.charcoal} />
+                  </View>
+                  <Text style={styles.featureTitle}>2. Live Video Chat</Text>
+                  <Text style={styles.featureDescription}>
+                    Jump into The Flare for instant 1-on-1 video calls. 5 seconds to
+                    decide, up to 1 minute to connect.
+                  </Text>
+                </View>
 
-                  <TouchableOpacity
-                    style={styles.checkboxRow}
-                    onPress={() => setAcceptedPrivacy(!acceptedPrivacy)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={[styles.checkbox, acceptedPrivacy && styles.checkboxChecked]}>
-                      {acceptedPrivacy && <Check size={16} color={Colors.white} strokeWidth={3} />}
-                    </View>
-                    <Text style={styles.agreementText}>
-                      I agree to the{" "}
-                      <Text
-                        style={styles.linkText}
-                        onPress={(e) => {
-                          e.stopPropagation();
-                          router.push("/privacy-policy");
-                        }}
-                      >
-                        Privacy Policy
-                      </Text>
-                    </Text>
-                  </TouchableOpacity>
+                <View style={styles.featureCard}>
+                  <View style={styles.featureIconContainer}>
+                    <Heart size={32} color={Colors.charcoal} />
+                  </View>
+                  <Text style={styles.featureTitle}>3. Make Real Plans</Text>
+                  <Text style={styles.featureDescription}>
+                    Both say yes? Share contacts and plan your first date or hangout
+                    instantly.
+                  </Text>
                 </View>
               </View>
-            )}
-          </Animated.View>
+            </View>
+          )}
+
+          {step === "privacy" && (
+            <View style={styles.stepContainer}>
+              <Text style={styles.title}>Your Safety First</Text>
+              <Text style={styles.subtitle}>We take your privacy seriously</Text>
+
+              <View style={styles.featuresContainer}>
+                <View style={styles.featureCard}>
+                  <View style={styles.featureIconContainer}>
+                    <Shield size={32} color={Colors.charcoal} />
+                  </View>
+                  <Text style={styles.featureTitle}>Face ID Verification</Text>
+                  <Text style={styles.featureDescription}>
+                    All users must verify their identity through facial recognition.
+                    Only real people, no bots.
+                  </Text>
+                </View>
+
+                <View style={styles.featureCard}>
+                  <View style={styles.featureIconContainer}>
+                    <MapPin size={32} color={Colors.charcoal} />
+                  </View>
+                  <Text style={styles.featureTitle}>Location Control</Text>
+                  <Text style={styles.featureDescription}>
+                    You control your search radius. Your exact location is never shared
+                    with other users.
+                  </Text>
+                </View>
+
+                <View style={styles.featureCard}>
+                  <View style={styles.featureIconContainer}>
+                    <Users size={32} color={Colors.charcoal} />
+                  </View>
+                  <Text style={styles.featureTitle}>AI Moderation</Text>
+                  <Text style={styles.featureDescription}>
+                    Advanced AI monitors video chats for inappropriate behavior to keep
+                    everyone safe.
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.agreementContainer}>
+                <TouchableOpacity
+                  style={styles.checkboxRow}
+                  onPress={() => setAcceptedTerms(!acceptedTerms)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.checkbox, acceptedTerms && styles.checkboxChecked]}>
+                    {acceptedTerms && <Check size={16} color={Colors.charcoal} strokeWidth={3} />}
+                  </View>
+                  <Text style={styles.agreementText}>
+                    I agree to the{" "}
+                    <Text
+                      style={styles.linkText}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        router.push("/terms");
+                      }}
+                    >
+                      Terms of Service
+                    </Text>
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.checkboxRow}
+                  onPress={() => setAcceptedPrivacy(!acceptedPrivacy)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.checkbox, acceptedPrivacy && styles.checkboxChecked]}>
+                    {acceptedPrivacy && <Check size={16} color={Colors.charcoal} strokeWidth={3} />}
+                  </View>
+                  <Text style={styles.agreementText}>
+                    I agree to the{" "}
+                    <Text
+                      style={styles.linkText}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        router.push("/privacy-policy");
+                      }}
+                    >
+                      Privacy Policy
+                    </Text>
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </ScrollView>
 
         <View style={styles.footer}>
@@ -240,20 +220,14 @@ export default function OnboardingScreen() {
             onPress={handleNext}
             disabled={step === "privacy" && (!acceptedTerms || !acceptedPrivacy)}
           >
-            <LinearGradient
-              colors={
-                step === "privacy" && (!acceptedTerms || !acceptedPrivacy)
-                  ? [Colors.surface, Colors.surface]
-                  : (Colors.gradient1 as [string, string, ...string[]])
-              }
-              style={styles.nextButtonGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
+            <Text
+              style={[
+                styles.nextButtonText,
+                step === "privacy" && (!acceptedTerms || !acceptedPrivacy) && styles.nextButtonTextDisabled,
+              ]}
             >
-              <Text style={styles.nextButtonText}>
-                {step === "privacy" ? "Get Started" : "Next"}
-              </Text>
-            </LinearGradient>
+              {step === "privacy" ? "Get Started" : "Next"}
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -273,22 +247,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingVertical: 16,
   },
   dotsContainer: {
     flexDirection: "row",
-    gap: 10,
+    gap: 8,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.textTertiary,
+    backgroundColor: Colors.white,
+    opacity: 0.4,
   },
   dotActive: {
-    width: 32,
-    backgroundColor: Colors.primary,
+    opacity: 1,
+    width: 24,
   },
+
   scrollView: {
     flex: 1,
   },
@@ -299,104 +275,117 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 20,
   },
-  content: {
-    alignItems: "center",
-    width: "100%",
-  },
-  heroIconContainer: {
+  sparkContainer: {
     marginBottom: 40,
   },
-  heroIconGradient: {
+  sparkOuter: {
     width: 140,
     height: 140,
     borderRadius: 70,
+    backgroundColor: Colors.pastelYellow,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 24,
-    elevation: 12,
+    shadowColor: Colors.pastelYellow,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 30,
+    elevation: 10,
+  },
+  sparkInner: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: Colors.white,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sparkEmoji: {
+    fontSize: 60,
   },
   title: {
-    fontSize: 36,
-    fontWeight: "800" as const,
-    color: Colors.text,
-    marginBottom: 16,
+    fontSize: 32,
+    fontWeight: "700" as const,
+    color: Colors.charcoal,
+    marginBottom: 12,
     textAlign: "center",
-    letterSpacing: -1,
   },
   subtitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "500" as const,
-    color: Colors.textSecondary,
+    color: Colors.charcoal,
+    opacity: 0.7,
     textAlign: "center",
-    marginBottom: 40,
+    marginBottom: 32,
     paddingHorizontal: 20,
-    lineHeight: 26,
+    lineHeight: 24,
   },
   featuresContainer: {
     width: "100%",
-    gap: 20,
+    gap: 16,
   },
   featureCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: 20,
-    padding: 24,
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 20,
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: Colors.border,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 2,
   },
   featureIconContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: Colors.pastelYellow,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
   },
   featureTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700" as const,
-    color: Colors.text,
-    marginBottom: 10,
+    color: Colors.charcoal,
+    marginBottom: 8,
     textAlign: "center",
   },
   featureDescription: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "500" as const,
-    color: Colors.textSecondary,
+    color: Colors.charcoal,
+    opacity: 0.7,
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: 20,
   },
   footer: {
     paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingVertical: 16,
   },
   nextButton: {
-    height: 58,
-    borderRadius: 29,
-    overflow: "hidden",
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  nextButtonDisabled: {
-    opacity: 0.5,
-    shadowOpacity: 0,
-  },
-  nextButtonGradient: {
-    flex: 1,
+    height: 56,
+    backgroundColor: Colors.pastelYellow,
+    borderRadius: 28,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: Colors.pastelYellow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 4,
   },
   nextButtonText: {
     fontSize: 18,
     fontWeight: "700" as const,
-    color: Colors.white,
-    letterSpacing: 0.5,
+    color: Colors.charcoal,
+  },
+  nextButtonDisabled: {
+    backgroundColor: Colors.lightGray,
+    opacity: 0.5,
+    shadowOpacity: 0,
+  },
+  nextButtonTextDisabled: {
+    opacity: 0.5,
   },
   agreementContainer: {
     marginTop: 32,
@@ -411,26 +400,26 @@ const styles = StyleSheet.create({
   checkbox: {
     width: 24,
     height: 24,
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: 2,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
+    borderColor: Colors.charcoal,
+    backgroundColor: Colors.white,
     alignItems: "center",
     justifyContent: "center",
   },
   checkboxChecked: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    backgroundColor: Colors.pastelYellow,
+    borderColor: Colors.pastelYellow,
   },
   agreementText: {
-    fontSize: 15,
-    fontWeight: "500" as const,
-    color: Colors.textSecondary,
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: Colors.charcoal,
     flex: 1,
-    lineHeight: 22,
+    lineHeight: 20,
   },
   linkText: {
-    color: Colors.primary,
+    color: Colors.softPurple,
     fontWeight: "700" as const,
     textDecorationLine: "underline" as const,
   },
