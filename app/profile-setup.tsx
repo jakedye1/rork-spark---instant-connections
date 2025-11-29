@@ -1,8 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { Camera, User, Heart, Users, MapPin, ArrowRight } from "lucide-react-native";
+import { Camera, User, Heart, Users, MapPin } from "lucide-react-native";
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "expo-router";
 import {
   StyleSheet,
   Text,
@@ -15,7 +14,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BlurView } from "expo-blur";
 import Colors from "@/constants/colors";
 
 const INTERESTS = [
@@ -35,7 +33,6 @@ const INTERESTS = [
 
 export default function ProfileSetupScreen() {
   const { updateProfile } = useAuth();
-  const router = useRouter();
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
@@ -89,7 +86,6 @@ export default function ProfileSetupScreen() {
         distance,
       });
       console.log("Profile updated successfully");
-      router.replace("/(tabs)/home");
     } catch (error) {
       console.error("Failed to update profile:", error);
       Alert.alert("Error", "Failed to create profile. Please try again.");
@@ -98,153 +94,116 @@ export default function ProfileSetupScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        colors={[Colors.background, Colors.backgroundLight]}
-        style={styles.background}
-      />
-      
-      <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-        <View style={styles.header}>
-           {/* Added invisible back button for spacing balance if needed, or we can add a real one if user wants to go back to onboarding */}
-           <View style={{ width: 40 }} /> 
-           <Text style={styles.headerTitle}>Profile Setup</Text>
-           <View style={{ width: 40 }} />
-        </View>
-
+    <LinearGradient
+      colors={[Colors.babyBlue, Colors.pastelYellow]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
+      <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode="on-drag"
         >
-          <Text style={styles.title}>Create Your Vibe</Text>
-          <Text style={styles.subtitle}>Let&apos;s get to know the real you</Text>
+          <Text style={styles.title}>Create Your Profile</Text>
+          <Text style={styles.subtitle}>Let&apos;s get to know you better</Text>
 
           <View style={styles.photoSection}>
             <TouchableOpacity style={styles.photoButton}>
-              <LinearGradient
-                colors={[Colors.glass, Colors.glassDark]}
-                style={styles.photoButtonGradient}
-              >
-                <View style={styles.photoIconContainer}>
-                  <Camera size={32} color={Colors.babyBlue} />
-                </View>
-                <Text style={styles.photoButtonText}>Add Photos</Text>
-              </LinearGradient>
+              <Camera size={32} color={Colors.charcoal} />
+              <Text style={styles.photoButtonText}>Add Photos</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.inputSection}>
             <Text style={styles.label}>Name</Text>
-            <BlurView intensity={20} tint="dark" style={styles.inputBlur}>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your name"
-                placeholderTextColor={Colors.textSecondary}
-                value={name}
-                onChangeText={setName}
-              />
-            </BlurView>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your name"
+              placeholderTextColor={Colors.mediumGray}
+              value={name}
+              onChangeText={setName}
+            />
           </View>
 
           <View style={styles.inputSection}>
             <Text style={styles.label}>Age</Text>
-            <BlurView intensity={20} tint="dark" style={styles.inputBlur}>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your age"
-                placeholderTextColor={Colors.textSecondary}
-                value={age}
-                onChangeText={setAge}
-                keyboardType="number-pad"
-              />
-            </BlurView>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your age"
+              placeholderTextColor={Colors.mediumGray}
+              value={age}
+              onChangeText={setAge}
+              keyboardType="number-pad"
+            />
           </View>
 
           <View style={styles.inputSection}>
             <Text style={styles.label}>I&apos;m looking for</Text>
             <View style={styles.lookingForContainer}>
               <TouchableOpacity
-                style={styles.lookingForButtonWrapper}
+                style={[
+                  styles.lookingForButton,
+                  lookingFor === "dating" && styles.lookingForButtonActive,
+                ]}
                 onPress={() => setLookingFor("dating")}
               >
-                <BlurView 
-                  intensity={lookingFor === "dating" ? 40 : 10} 
-                  tint="dark" 
+                <Heart
+                  size={20}
+                  color={lookingFor === "dating" ? Colors.charcoal : Colors.mediumGray}
+                />
+                <Text
                   style={[
-                    styles.lookingForButton,
-                    lookingFor === "dating" && styles.lookingForButtonActive
+                    styles.lookingForText,
+                    lookingFor === "dating" && styles.lookingForTextActive,
                   ]}
                 >
-                  <Heart
-                    size={20}
-                    color={lookingFor === "dating" ? Colors.babyBlue : Colors.textSecondary}
-                    fill={lookingFor === "dating" ? Colors.babyBlue : "transparent"}
-                  />
-                  <Text
-                    style={[
-                      styles.lookingForText,
-                      lookingFor === "dating" && styles.lookingForTextActive,
-                    ]}
-                  >
-                    Dating
-                  </Text>
-                </BlurView>
+                  Dating
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.lookingForButtonWrapper}
+                style={[
+                  styles.lookingForButton,
+                  lookingFor === "friends" && styles.lookingForButtonActive,
+                ]}
                 onPress={() => setLookingFor("friends")}
               >
-                <BlurView 
-                  intensity={lookingFor === "friends" ? 40 : 10} 
-                  tint="dark" 
+                <User
+                  size={20}
+                  color={lookingFor === "friends" ? Colors.charcoal : Colors.mediumGray}
+                />
+                <Text
                   style={[
-                    styles.lookingForButton,
-                    lookingFor === "friends" && styles.lookingForButtonActive
+                    styles.lookingForText,
+                    lookingFor === "friends" && styles.lookingForTextActive,
                   ]}
                 >
-                  <User
-                    size={20}
-                    color={lookingFor === "friends" ? Colors.pastelYellow : Colors.textSecondary}
-                  />
-                  <Text
-                    style={[
-                      styles.lookingForText,
-                      lookingFor === "friends" && styles.lookingForTextActive,
-                    ]}
-                  >
-                    Friends
-                  </Text>
-                </BlurView>
+                  Friends
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.lookingForButtonWrapper}
+                style={[
+                  styles.lookingForButton,
+                  lookingFor === "groups" && styles.lookingForButtonActive,
+                ]}
                 onPress={() => setLookingFor("groups")}
               >
-                <BlurView 
-                  intensity={lookingFor === "groups" ? 40 : 10} 
-                  tint="dark" 
+                <Users
+                  size={20}
+                  color={lookingFor === "groups" ? Colors.charcoal : Colors.mediumGray}
+                />
+                <Text
                   style={[
-                    styles.lookingForButton,
-                    lookingFor === "groups" && styles.lookingForButtonActive
+                    styles.lookingForText,
+                    lookingFor === "groups" && styles.lookingForTextActive,
                   ]}
                 >
-                  <Users
-                    size={20}
-                    color={lookingFor === "groups" ? Colors.aquaGlow : Colors.textSecondary}
-                  />
-                  <Text
-                    style={[
-                      styles.lookingForText,
-                      lookingFor === "groups" && styles.lookingForTextActive,
-                    ]}
-                  >
-                    Groups
-                  </Text>
-                </BlurView>
+                  Groups
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -255,88 +214,76 @@ export default function ProfileSetupScreen() {
               {INTERESTS.map((interest) => (
                 <TouchableOpacity
                   key={interest}
+                  style={[
+                    styles.interestTag,
+                    selectedInterests.includes(interest) && styles.interestTagActive,
+                  ]}
                   onPress={() => toggleInterest(interest)}
-                  style={styles.interestTagWrapper}
                 >
-                  <BlurView
-                    intensity={selectedInterests.includes(interest) ? 40 : 10}
-                    tint="dark"
+                  <Text
                     style={[
-                      styles.interestTag,
-                      selectedInterests.includes(interest) && styles.interestTagActive,
+                      styles.interestTagText,
+                      selectedInterests.includes(interest) && styles.interestTagTextActive,
                     ]}
                   >
-                    <Text
-                      style={[
-                        styles.interestTagText,
-                        selectedInterests.includes(interest) && styles.interestTagTextActive,
-                      ]}
-                    >
-                      {interest}
-                    </Text>
-                  </BlurView>
+                    {interest}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
 
           <View style={styles.inputSection}>
-            <BlurView intensity={10} tint="dark" style={styles.locationContainer}>
-              <View style={styles.locationHeader}>
-                <View style={styles.locationTitleContainer}>
-                  <MapPin size={20} color={Colors.babyBlue} />
-                  <Text style={[styles.label, { marginBottom: 0 }]}>Location & Distance</Text>
-                </View>
-                <Switch
-                  value={locationEnabled}
-                  onValueChange={setLocationEnabled}
-                  trackColor={{ false: Colors.glass, true: Colors.babyBlue }}
-                  thumbColor={Colors.white}
-                  ios_backgroundColor={Colors.glass}
-                />
+            <View style={styles.locationHeader}>
+              <View style={styles.locationTitleContainer}>
+                <MapPin size={20} color={Colors.charcoal} />
+                <Text style={styles.label}>Location & Distance</Text>
               </View>
-              
-              {locationEnabled && (
-                <View style={styles.locationContent}>
-                  <Text style={styles.locationDescription}>
-                    Find people within <Text style={{color: Colors.babyBlue}}>{distance}</Text> miles of you
-                  </Text>
-                  <View style={styles.distanceSliderContainer}>
-                    <Text style={styles.distanceLabel}>5 mi</Text>
-                    <View style={styles.distanceSlider}>
-                      <View style={styles.distanceTrack}>
-                        <LinearGradient
-                          colors={[Colors.babyBlue, Colors.aquaGlow]}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 0 }}
-                          style={[
-                            styles.distanceTrackActive,
-                            { width: `${((distance - 5) / 95) * 100}%` },
-                          ]}
-                        />
-                      </View>
-                      <View style={styles.distanceMarkers}>
-                        {[5, 25, 50, 75, 100].map((value) => (
-                          <TouchableOpacity
-                            key={value}
-                            style={styles.distanceMarker}
-                            onPress={() => setDistance(value)}
-                          >
-                            <View
-                              style={[
-                                styles.distanceMarkerDot,
-                                distance === value && styles.distanceMarkerDotActive,
-                              ]}
-                            />
-                          </TouchableOpacity>
-                        ))}
-                      </View>
+              <Switch
+                value={locationEnabled}
+                onValueChange={setLocationEnabled}
+                trackColor={{ false: Colors.mediumGray, true: Colors.pastelYellow }}
+                thumbColor={Colors.white}
+                ios_backgroundColor={Colors.mediumGray}
+              />
+            </View>
+            {locationEnabled && (
+              <View style={styles.locationContent}>
+                <Text style={styles.locationDescription}>
+                  Find people within {distance} miles of you
+                </Text>
+                <View style={styles.distanceSliderContainer}>
+                  <Text style={styles.distanceLabel}>5 mi</Text>
+                  <View style={styles.distanceSlider}>
+                    <View style={styles.distanceTrack}>
+                      <View
+                        style={[
+                          styles.distanceTrackActive,
+                          { width: `${((distance - 5) / 95) * 100}%` },
+                        ]}
+                      />
                     </View>
-                    <Text style={styles.distanceLabel}>100 mi</Text>
+                    <View style={styles.distanceMarkers}>
+                      {[5, 25, 50, 75, 100].map((value) => (
+                        <TouchableOpacity
+                          key={value}
+                          style={styles.distanceMarker}
+                          onPress={() => setDistance(value)}
+                        >
+                          <View
+                            style={[
+                              styles.distanceMarkerDot,
+                              distance === value && styles.distanceMarkerDotActive,
+                            ]}
+                          />
+                        </TouchableOpacity>
+                      ))}
+                    </View>
                   </View>
+                  <Text style={styles.distanceLabel}>100 mi</Text>
                 </View>
-              )}
-            </BlurView>
+              </View>
+            )}
           </View>
 
           <TouchableOpacity 
@@ -344,58 +291,26 @@ export default function ProfileSetupScreen() {
             onPress={handleContinue}
             disabled={isSubmitting}
           >
-            <LinearGradient
-              colors={[Colors.babyBlue, Colors.aquaGlow]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.continueButtonGradient}
-            >
-              {isSubmitting ? (
-                <ActivityIndicator color={Colors.charcoal} />
-              ) : (
-                <View style={styles.continueContent}>
-                  <Text style={styles.continueButtonText}>Continue</Text>
-                  <ArrowRight size={20} color={Colors.charcoal} />
-                </View>
-              )}
-            </LinearGradient>
+            {isSubmitting ? (
+              <ActivityIndicator color={Colors.charcoal} />
+            ) : (
+              <Text style={styles.continueButtonText}>Continue</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </SafeAreaView>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-  },
-  background: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
   },
   safeArea: {
     flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: Colors.textSecondary,
-    textTransform: "uppercase",
-    letterSpacing: 1,
   },
   scrollView: {
     flex: 1,
@@ -405,15 +320,16 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: "700",
-    color: Colors.white,
-    marginTop: 10,
+    fontWeight: "700" as const,
+    color: Colors.charcoal,
+    marginTop: 20,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    fontWeight: "500",
-    color: Colors.textSecondary,
+    fontWeight: "500" as const,
+    color: Colors.charcoal,
+    opacity: 0.7,
     marginBottom: 32,
   },
   photoSection: {
@@ -421,120 +337,104 @@ const styles = StyleSheet.create({
   },
   photoButton: {
     height: 140,
-    borderRadius: 24,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: Colors.pastelYellow,
     borderStyle: "dashed",
-  },
-  photoButtonGradient: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  photoIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: Colors.glassLight,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 12,
   },
   photoButtonText: {
     fontSize: 16,
-    fontWeight: "600",
-    color: Colors.babyBlue,
+    fontWeight: "600" as const,
+    color: Colors.charcoal,
+    marginTop: 8,
   },
   inputSection: {
     marginBottom: 24,
   },
   label: {
     fontSize: 16,
-    fontWeight: "600",
-    color: Colors.white,
-    marginBottom: 12,
-  },
-  inputBlur: {
-    borderRadius: 16,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
+    fontWeight: "600" as const,
+    color: Colors.charcoal,
+    marginBottom: 8,
   },
   input: {
-    height: 56,
+    height: 52,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 16,
-    color: Colors.white,
+    color: Colors.charcoal,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 2,
   },
   lookingForContainer: {
     flexDirection: "row",
     gap: 12,
   },
-  lookingForButtonWrapper: {
-    flex: 1,
-    borderRadius: 16,
-    overflow: "hidden",
-  },
   lookingForButton: {
-    height: 80,
+    flex: 1,
+    height: 52,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 2,
   },
   lookingForButtonActive: {
-    borderColor: Colors.babyBlue,
-    backgroundColor: Colors.glassLight,
+    backgroundColor: Colors.pastelYellow,
   },
   lookingForText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: Colors.textSecondary,
+    fontWeight: "600" as const,
+    color: Colors.mediumGray,
   },
   lookingForTextActive: {
-    color: Colors.white,
+    color: Colors.charcoal,
   },
   interestsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
   },
-  interestTagWrapper: {
-    borderRadius: 20,
-    overflow: "hidden",
-  },
   interestTag: {
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
+    backgroundColor: Colors.white,
+    borderRadius: 20,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   interestTagActive: {
-    borderColor: Colors.pastelYellow,
-    backgroundColor: Colors.glassLight,
+    backgroundColor: Colors.pastelYellow,
   },
   interestTagText: {
     fontSize: 14,
-    fontWeight: "500",
-    color: Colors.textSecondary,
+    fontWeight: "500" as const,
+    color: Colors.mediumGray,
   },
   interestTagTextActive: {
-    color: Colors.white,
-    fontWeight: "600",
-  },
-  locationContainer: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
-    padding: 16,
+    color: Colors.charcoal,
   },
   locationHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 12,
   },
   locationTitleContainer: {
     flexDirection: "row",
@@ -542,12 +442,19 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   locationContent: {
-    marginTop: 20,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 2,
   },
   locationDescription: {
     fontSize: 14,
-    fontWeight: "600",
-    color: Colors.textSecondary,
+    fontWeight: "600" as const,
+    color: Colors.charcoal,
     marginBottom: 16,
     textAlign: "center",
   },
@@ -558,82 +465,68 @@ const styles = StyleSheet.create({
   },
   distanceLabel: {
     fontSize: 12,
-    fontWeight: "600",
-    color: Colors.textSecondary,
-    width: 40,
+    fontWeight: "600" as const,
+    color: Colors.mediumGray,
   },
   distanceSlider: {
     flex: 1,
     position: "relative",
-    height: 20,
-    justifyContent: 'center',
   },
   distanceTrack: {
     height: 4,
-    backgroundColor: Colors.glassLight,
+    backgroundColor: Colors.lightGray,
     borderRadius: 2,
     overflow: "hidden",
   },
   distanceTrackActive: {
     height: "100%",
+    backgroundColor: Colors.pastelYellow,
   },
   distanceMarkers: {
     flexDirection: "row",
     justifyContent: "space-between",
     position: "absolute",
-    top: 0,
+    top: -6,
     left: 0,
     right: 0,
-    bottom: 0,
-    alignItems: 'center',
   },
   distanceMarker: {
-    width: 20,
-    height: 20,
+    width: 16,
+    height: 16,
     alignItems: "center",
     justifyContent: "center",
   },
   distanceMarkerDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.textSecondary,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: Colors.white,
+    borderWidth: 2,
+    borderColor: Colors.mediumGray,
   },
   distanceMarkerDotActive: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: Colors.white,
-    borderWidth: 3,
-    borderColor: Colors.babyBlue,
+    borderColor: Colors.pastelYellow,
+    backgroundColor: Colors.pastelYellow,
   },
   continueButton: {
     height: 56,
+    backgroundColor: Colors.pastelYellow,
     borderRadius: 28,
-    overflow: 'hidden',
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 16,
-    shadowColor: Colors.babyBlue,
+    shadowColor: Colors.pastelYellow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 4,
-  },
-  continueButtonGradient: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  continueContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
   },
   continueButtonDisabled: {
     opacity: 0.6,
   },
   continueButtonText: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "700" as const,
     color: Colors.charcoal,
   },
   bottomSpacer: {
