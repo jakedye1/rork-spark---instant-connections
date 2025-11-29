@@ -2,6 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Camera, User, Mic, Bell, Sparkles } from "lucide-react-native";
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "expo-router";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import {
   StyleSheet,
@@ -39,6 +40,7 @@ type SetupStep = "profile" | "permissions";
 export default function ProfileSetupScreen() {
   const { updateProfile } = useAuth();
   const { requestAllPermissions, markPermissionsRequested } = usePermissions();
+  const router = useRouter();
   
   const [step, setStep] = useState<SetupStep>("profile");
   const [name, setName] = useState("");
@@ -76,32 +78,37 @@ export default function ProfileSetupScreen() {
       return;
     }
 
-    setStep("permissions");
+    setIsSubmitting(true);
+    try {
+      await updateProfile({
+        name: name.trim(),
+        age: age.trim(),
+        interests: selectedInterests,
+        lookingFor: "dating", // Default
+        locationEnabled: false, // Will ask in permissions? Or separate logic.
+        distance: 25,
+      });
+      setIsSubmitting(false);
+      setStep("permissions");
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      Alert.alert("Error", "Failed to create profile. Please try again.");
+      setIsSubmitting(false);
+    }
   };
 
   const handlePermissionsSubmit = async () => {
     setIsSubmitting(true);
     try {
-      console.log("Saving profile with data:", { name, age, interests: selectedInterests });
-      await updateProfile({
-        name: name.trim(),
-        age: age.trim(),
-        interests: selectedInterests,
-        lookingFor: "dating",
-        locationEnabled: false,
-        distance: 25,
-      });
-      console.log("Profile saved successfully");
-      
-      try {
-        await requestAllPermissions();
-        await markPermissionsRequested();
-      } catch (permError) {
-        console.log("Permission request handled:", permError);
-      }
+      await requestAllPermissions();
+      await markPermissionsRequested();
+      // Also enable location if needed, but context handles Camera/Mic mostly.
+      // Assuming location logic is handled elsewhere or implicitly.
+      router.replace("/(tabs)/home");
     } catch (error) {
-      console.error("Failed to save profile:", error);
-      Alert.alert("Error", "Failed to create profile. Please try again.");
+      console.error("Permission error:", error);
+      // Proceed anyway
+      router.replace("/(tabs)/home");
     } finally {
       setIsSubmitting(false);
     }
@@ -236,25 +243,6 @@ export default function ProfileSetupScreen() {
                     style={styles.button}
                     variant="primary"
                  />
-                 
-                 <TouchableOpacity onPress={async () => {
-                    setIsSubmitting(true);
-                    try {
-                      await updateProfile({
-                        name: name.trim(),
-                        age: age.trim(),
-                        interests: selectedInterests,
-                        lookingFor: "dating",
-                        locationEnabled: false,
-                        distance: 25,
-                      });
-                    } catch (error) {
-                      console.error("Failed to save profile:", error);
-                    }
-                    setIsSubmitting(false);
-                 }}>
-                   <Text style={styles.skipText}>Skip for now</Text>
-                 </TouchableOpacity>
                  
                  <Text style={styles.footerText}>You can change this anytime in settings</Text>
               </View>
@@ -398,17 +386,9 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: Colors.glassBorder,
   },
-  skipText: {
-    textAlign: "center",
-    color: Colors.textSecondary,
-    fontSize: 15,
-    fontWeight: "600",
-    marginTop: 16,
-  },
   footerText: {
     textAlign: "center",
     color: Colors.textTertiary,
     fontSize: 12,
-    marginTop: 8,
   },
 });
