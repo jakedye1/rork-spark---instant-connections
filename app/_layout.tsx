@@ -11,6 +11,7 @@ import { ChatsProvider } from "@/contexts/ChatsContext";
 import { ToastProvider, useToast } from "@/contexts/ToastContext";
 import { PermissionsProvider } from "@/contexts/PermissionsContext";
 import { PurchasesProvider } from "@/contexts/PurchasesContext";
+import { VideoConfigProvider } from "@/contexts/VideoConfigContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -72,11 +73,13 @@ export default function RootLayout() {
             <AuthProvider>
               <PurchasesProvider>
                 <PermissionsProvider>
-                  <FriendsProvider>
-                    <ChatsProvider>
-                      <RootLayoutNav />
-                    </ChatsProvider>
-                  </FriendsProvider>
+                  <VideoConfigProvider>
+                    <FriendsProvider>
+                      <ChatsProvider>
+                        <RootLayoutNav />
+                      </ChatsProvider>
+                    </FriendsProvider>
+                  </VideoConfigProvider>
                 </PermissionsProvider>
               </PurchasesProvider>
             </AuthProvider>

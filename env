@@ -1,0 +1,5 @@
+# Backend URL for video configuration and other backend services
+# Leave empty if backend is not enabled
+EXPO_PUBLIC_BACKEND_URL=
+
+# Example: EXPO_PUBLIC_BACKEND_URL=https://your-backend-url.com
